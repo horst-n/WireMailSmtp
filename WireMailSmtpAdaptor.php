@@ -1,20 +1,18 @@
 <?php
 /*******************************************************************************
-  *  PHP-CLASSES
+  *  WireMailSmtp
   *
-  *  @php_version -   5.3.x
   * ---------------------------------------------------------------------------
-  *  @version     -   v1.0
-  *  @date        -   $Date: 2014/03/06 19:43:51 $
+  *  @version     -   '0.0.6'
+  *  @date        -   $Date: 2014/03/07 18:57:32 $
   *  @author      -   Horst Nogajski <coding AT nogajski DOT de>
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
   * ---------------------------------------------------------------------------
   *  $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtpAdaptor.php,v $
-  *  $Id: WireMailSmtpAdaptor.php,v 1.7 2014/03/06 19:43:51 horst Exp $
+  *  $Id: WireMailSmtpAdaptor.php,v 1.8 2014/03/07 18:57:32 horst Exp $
   ******************************************************************************
   *
   *  LAST CHANGES:
-  *
   *
 **/
 
@@ -260,7 +258,7 @@ class hnsmtp {
 	}
 
 
-	public function setTextBody($text, $addSignature=true, $wrapText=true, &$maildata) {
+	public function setTextBody($text, $addSignature, $wrapText=true, &$maildata) {
 		if($addSignature===true && isset($this->sender_signature) && is_string($this->sender_signature) && strlen(trim($this->sender_signature))>0) {
 			$text .= "\r\n\r\n" . $this->sender_signature;
 		}
@@ -275,7 +273,7 @@ class hnsmtp {
 	}
 
 
-	public function setTextAndHtmlBody($text, $html, $addSignature=true, $wrapText=true, &$maildata1, &$maildata2) {
+	public function setTextAndHtmlBody($text, $html, $addSignature, $wrapText=true, &$maildata1, &$maildata2) {
 		if($addSignature===true && isset($this->sender_signature) && is_string($this->sender_signature) && strlen(trim($this->sender_signature))>0) {
 			$text .= "\r\n\r\n--\r\n" . $this->sender_signature;
 			$html = str_replace("</body>", "\r\n\r\n<pre>" . $this->sender_signature . "</pre>\r\n</body>", $html);
