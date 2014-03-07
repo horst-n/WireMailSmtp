@@ -1,4 +1,21 @@
 <?php
+/*******************************************************************************
+  *  WireMailSmtp
+  *
+  * ---------------------------------------------------------------------------
+  *  @version     -   '0.0.6'
+  *  @date        -   $Date: 2014/03/07 18:57:32 $
+  *  @author      -   Horst Nogajski <coding AT nogajski DOT de>
+  *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
+  * ---------------------------------------------------------------------------
+  *  $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtpConfig.php,v $
+  *  $Id: WireMailSmtpConfig.php,v 1.6 2014/03/07 18:57:32 horst Exp $
+  ******************************************************************************
+  *
+  *  LAST CHANGES:
+  *
+**/
+
 
 class WireMailSmtpConfig extends Wire {
 
