@@ -93,7 +93,7 @@ class WireMailSmtpConfig extends Wire {
 			$field->attr('type', 'password');
 			$field->label = __('SMTP password');
 			$field->description = __('Set this variable to the user password when the SMTP server requires authentication');
-	        $field->notes = __("Note: password is stored as plain text in database. THIS IS NOT SECURE. Don't use this setting unless you're fully aware of it's consequences!");
+			$field->notes = __("Note: password is stored as plain text in database.");
 			$field->columnWidth = 50;
 			$fieldset->add($field);
 
@@ -195,11 +195,11 @@ class WireMailSmtpConfig extends Wire {
 			$field->attr('name', 'send_sender_signature');
 			$field->attr('value', $data['send_sender_signature']);
 			$field->label = __('Send SenderSignature');
-	        $field->addOptions(array(
-	            '1' => 'only when explicitly called via API',
-	            '2' => 'automaticaly when FROM = Sender Emailaddress',
-	            '3' => 'automaticaly with _every_ Message'
-	        ));
+	        	$field->addOptions(array(
+	            		'1' => 'only when explicitly called via API',
+	            		'2' => 'automaticaly when FROM = Sender Emailaddress',
+	            		'3' => 'automaticaly with _every_ Message'
+	        	));
 			$field->description = __('when the Signature should be send by default, - (could be overriden by the API)');
 			$field->columnWidth = 40;
 			$fieldset->add($field);
