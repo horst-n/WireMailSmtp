@@ -20,11 +20,21 @@
 
 
 
-
-
-/**
- * $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtp.module,v $
- * $Id: WireMailSmtp.module,v 1.10 2014/03/06 19:43:51 horst Exp $
+/*******************************************************************************
+  *  WireMailSmtp
+  *
+  * ---------------------------------------------------------------------------
+  *  @version     -   '0.0.6'
+  *  @date        -   $Date: 2014/03/07 18:57:31 $
+  *  @author      -   Horst Nogajski <coding AT nogajski DOT de>
+  *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
+  * ---------------------------------------------------------------------------
+  *  $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtp.module,v $
+  *  $Id: WireMailSmtp.module,v 1.11 2014/03/07 18:57:31 horst Exp $
+  ******************************************************************************
+  *
+  *  LAST CHANGES:
+  *
 **/
 
 
@@ -34,7 +44,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			'title'     => 'Wire Mail SMTP',
-			'version'   => 5,
+			'version'   => '0.0.6',
 			'summary'   => "extends WireMail, uses SMTP Protocol, provides: TO, CC, BCC, Attachments, Priority, DispositionNotification, protocols PLAIN - SSL - START_TLS, Bulksending, ... \nIn a future version personalized message sending will be supported too.",
 			'href'      => '', //'http://mods.pw/???',
 			'author'    => 'horst',
@@ -73,7 +83,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		'subject' => '',
 		'body' => '',
 		'bodyHTML' => '',
-		'addSignature' => '',
+		'addSignature' => null,
 		'attachments' => array(),
 		'header' => array(),
 		'sendSingle' => false,
@@ -108,7 +118,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 			'sender_reply'             => '',     // Reply-To: optional email address
 			'sender_errors_to'         => '',     // Errors-To: optional email address
 			'sender_signature'         => '',     // a Signature Text, like Contact Data and / or Confidentiality Notices
-			'send_sender_signature'    => 1,      // when the signature should be send: with every mail | only when the default Email is the sender | only when explicitly called via the API
+			'send_sender_signature'    => '1',    // when the signature should be send: with every mail | only when the default Email is the sender | only when explicitly called via the API
 			'extra_headers'            => '',     // optional Custom-Meta-Headers
 			'valid_recipients'         => ''      // email addresses of valid recipients. String that we convert to array at runtime.
 			);
@@ -512,10 +522,10 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		if($this->bodyHTML) {
 			// we use MultipartAlternative
 			$text = strlen($this->body) ? $this->body : strip_tags($this->bodyHTML);
-			$this->setTextAndHtmlBody($text, $this->bodyHTML, (bool)$this->mail['addSignature']);
+			$this->setTextAndHtmlBody($text, $this->bodyHTML, $this->mail['addSignature']);
 		} else {
 			// we use plaintext
-			$this->setTextBody($this->body, (bool)$this->mail['addSignature']);
+			$this->setTextBody($this->body, $this->mail['addSignature']);
 		}
 
 
@@ -559,8 +569,8 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		$numSent = 0;
 		$recipientsSuccess = array();
 		$recipientsFailed = array();
-		$this->smtp->SetBulkMail(1);
-		if(count($this->to)>25) $this->mail['sendBulk'] = true;
+		if(count($this->to)>5 || $this->mail['sendBulk']) $this->smtp->SetBulkMail(1);
+		if(count($this->to)>50) $this->mail['sendBulk'] = true;
 		if($this->mail['sendBulk']) $this->smtp->SetHeader('Precedence', 'bulk');
 		foreach($this->bcc as $bcc) $this->addRecipient($bcc, '', 'bcc');
 		foreach($this->to as $to) {
@@ -580,7 +590,8 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 			}
 			$numSent += $ret ? 1 : 0;
 		}
-		$this->smtp->SetBulkMail(0);
+		if(count($this->to)>5 || $this->mail['sendBulk']) $this->smtp->SetBulkMail(0);
+		$this->smtp->close();
 
 		$this->maildata['send'] = $maildata;
 		$this->maildata['recipientsSuccess'] = $recipientsSuccess;
@@ -631,16 +642,56 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 				return $this->smtp->setHeader('Subject', (string)$text);
 			}
 
-			protected function setTextBody($text, $addSignature=true, $wrapText=true) {
+			protected function setTextBody($text, $addSignature=null, $wrapText=true) {
 				$maildata = '';
+                if(!is_bool($addSignature)) {
+                	if(in_array($this->send_sender_signature, array('1','2','3'))) {
+                		switch($this->send_sender_signature) {
+							case '1':   // only when explicitly called via API
+								$addSignature = false;
+								break;
+							case '2':   // automaticaly when FROM = Sender Emailaddress
+                				$from = strtolower(trim(str_replace(array('<','>'), '', $this->from)));
+								$sender = strtolower(trim(str_replace(array('<','>'), '', $this->sender_email)));
+								$addSignature = $from == $sender || '' == $from ? true : false;
+								break;
+							case '3':   // automaticaly with _every_ Message
+								$addSignature = true;
+								break;
+                		}
+                	}
+                	else {
+						$addSignature = false;
+					}
+				}
 				$res = $this->smtp->setTextBody($text, $addSignature, $wrapText, $maildata);
 				$this->maildata['addSignature'] = $addSignature ? '1' : '0';
 				$this->maildata['textbody'] = $maildata;
 				return $res;
 			}
 
-			protected function setTextAndHtmlBody($text, $html, $addSignature=true, $wrapText=true) {
+			protected function setTextAndHtmlBody($text, $html, $addSignature=null, $wrapText=true) {
 				$maildata1 = $maildata2 = '';
+                if(!is_bool($addSignature)) {
+                	if(in_array($this->send_sender_signature, array('1','2','3'))) {
+                		switch($this->send_sender_signature) {
+							case '1':   // only when explicitly called via API
+								$addSignature = false;
+								break;
+							case '2':   // automaticaly when FROM = Sender Emailaddress
+                				$from = strtolower(trim(str_replace(array('<','>'), '', $this->from)));
+								$sender = strtolower(trim(str_replace(array('<','>'), '', $this->sender_email)));
+								$addSignature = $from == $sender || '' == $from ? true : false;
+								break;
+							case '3':   // automaticaly with _every_ Message
+								$addSignature = true;
+								break;
+                		}
+                	}
+                	else {
+						$addSignature = false;
+					}
+				}
 				$res = $this->smtp->setTextAndHtmlBody($text, $html, $addSignature, $wrapText, $maildata1, $maildata2);
 				$this->maildata['addSignature'] = $addSignature ? '1' : '0';
 				$this->maildata['textbody'] = $maildata1;
