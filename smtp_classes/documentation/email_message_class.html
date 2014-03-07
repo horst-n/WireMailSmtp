@@ -1,0 +1,1048 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Class: MIME E-mail message composing and sending</title>
+</head>
+<body>
+<center><h1>Class: MIME E-mail message composing and sending</h1></center>
+<hr />
+<ul>
+<p><b>Version:</b> <tt>@(#) $Id: email_message_class.html,v 1.1 2014/03/03 12:28:31 horst Exp $</tt></p>
+<h2><a name="table_of_contents">Contents</a></h2>
+<ul>
+<li><a href="#2.1.1">Summary</a></li>
+<ul>
+<li><a href="#3.2.0">Name</a></li>
+<li><a href="#3.2.0.0">Author</a></li>
+<li><a href="#3.2.0.1">Copyright</a></li>
+<li><a href="#3.2.0.2">Version</a></li>
+<li><a href="#3.2.0.3">Purpose</a></li>
+<li><a href="#3.2.0.4">Translation</a></li>
+<li><a href="#3.2.0.5">Support</a></li>
+<li><a href="#3.2.0.6">Usage</a></li>
+</ul>
+<li><a href="#4.1.1">Variables</a></li>
+<ul>
+<li><a href="#5.2.12">email_regular_expression</a></li>
+<li><a href="#5.2.13">mailer</a></li>
+<li><a href="#5.2.14">mailer_delivery</a></li>
+<li><a href="#5.2.15">default_charset</a></li>
+<li><a href="#5.2.16">line_quote_prefix</a></li>
+<li><a href="#5.2.17">break_long_lines</a></li>
+<li><a href="#5.2.18">file_buffer_length</a></li>
+<li><a href="#5.2.19">debug</a></li>
+<li><a href="#5.2.20">cache_body</a></li>
+<li><a href="#5.2.21">error</a></li>
+<li><a href="#5.2.22">localhost</a></li>
+</ul>
+<li><a href="#6.1.1">Functions</a></li>
+<ul>
+<li><a href="#7.2.38">ValidateEmailAddress</a></li>
+<li><a href="#9.2.39">WrapText</a></li>
+<li><a href="#11.2.40">CenterText</a></li>
+<li><a href="#13.2.41">Ruler</a></li>
+<li><a href="#15.2.42">QuoteText</a></li>
+<li><a href="#17.2.43">SetHeader</a></li>
+<li><a href="#19.2.44">SetEncodedHeader</a></li>
+<li><a href="#21.2.45">SetEncodedEmailHeader</a></li>
+<li><a href="#23.2.46">SetMultipleEncodedEmailHeader</a></li>
+<li><a href="#25.2.47">ResetMessage</a></li>
+<li><a href="#25.2.48">AddPart</a></li>
+<li><a href="#27.2.49">ReplacePart</a></li>
+<li><a href="#29.2.50">CreatePlainTextPart</a></li>
+<li><a href="#31.2.51">AddPlainTextPart</a></li>
+<li><a href="#33.2.52">CreateQuotedPrintableTextPart</a></li>
+<li><a href="#35.2.53">AddQuotedPrintableTextPart</a></li>
+<li><a href="#37.2.54">CreateHTMLPart</a></li>
+<li><a href="#39.2.55">AddHTMLPart</a></li>
+<li><a href="#41.2.56">CreateQuotedPrintableHTMLPart</a></li>
+<li><a href="#43.2.57">AddQuotedPrintableHTMLPart</a></li>
+<li><a href="#45.2.58">CreateFilePart</a></li>
+<li><a href="#47.2.59">AddFilePart</a></li>
+<li><a href="#49.2.60">CreateMessagePart</a></li>
+<li><a href="#51.2.61">AddMessagePart</a></li>
+<li><a href="#53.2.62">CreateAlternativeMultipart</a></li>
+<li><a href="#55.2.63">AddAlternativeMultipart</a></li>
+<li><a href="#57.2.64">CreateRelatedMultipart</a></li>
+<li><a href="#59.2.65">AddRelatedMultipart</a></li>
+<li><a href="#61.2.66">CreateMixedMultipart</a></li>
+<li><a href="#63.2.67">AddMixedMultipart</a></li>
+<li><a href="#65.2.68">GetPartContentID</a></li>
+<li><a href="#67.2.69">GetDataURL</a></li>
+<li><a href="#69.2.70">Send</a></li>
+<li><a href="#69.2.71">GetMessage</a></li>
+<li><a href="#71.2.72">GetMessageSize</a></li>
+<li><a href="#73.2.73">Mail</a></li>
+<li><a href="#75.2.74">SetBulkMail</a></li>
+</ul>
+</ul>
+<p><a href="#table_of_contents">Top of the table of contents</a></p>
+</ul>
+<hr />
+<ul>
+<h2><li><a name="2.1.1">Summary</a></li></h2>
+<ul>
+<h3><a name="3.2.0">Name</a></h3>
+<p>MIME E-mail message composing and sending</p>
+<h3><a name="3.2.0.0">Author</a></h3>
+<p>Manuel Lemos (<a href="mailto:mlemos-at-acm.org">mlemos-at-acm.org</a>)</p>
+<h3><a name="3.2.0.1">Copyright</a></h3>
+<p>Copyright &copy; (C) Manuel Lemos 1999-2004</p>
+<h3><a name="3.2.0.2">Version</a></h3>
+<p>@(#) $Id: email_message_class.html,v 1.1 2014/03/03 12:28:31 horst Exp $</p>
+<h3><a name="3.2.0.3">Purpose</a></h3>
+<p>Compose and send e-mail messages according to the MIME standards.</p>
+<h3><a name="3.2.0.4">Translation</a></h3>
+<p>If you are interested in translating the documentation of this class to your own idiom, please <a href="mailto:mlemos-at-acm.org">contact the author</a>.</p>
+<h3><a name="3.2.0.5">Support</a></h3>
+<p>Technical support for using this class may be obtained in the <tt>mimemessage-dev</tt> mailing list. Just go to the mailing list page to browse the list archives, learn how to to join and post support request messages:</p>
+<p> <a href="http://groups-beta.google.com/group/mimemessage-dev">http://groups-beta.google.com/group/mimemessage-dev</a></p>
+<h3><a name="3.2.0.6">Usage</a></h3>
+<p>To used this class just create a new object as follows, set any variables to configure its behavior and call the functions you need to compose and send your messages.</p>
+<p> <tt>require('email_message.php');<br />
+ <br />
+ $message_object = new email_message_class;<br />
+</tt></p>
+<p> <b>- Set the sender and recipients</b></p>
+<p> You can set the message sender and one or more recipient addresses using the <tt><a href="#function_SetHeader">SetHeader</a></tt> or the <tt><a href="#function_SetEncodedEmailHeader">SetEncodedEmailHeader</a></tt> functions specifying the addresses for the <tt>From</tt>, <tt>To</tt>, <tt>Cc</tt> and <tt>Bcc</tt> headers.</p>
+<p> <b>- Formatting text messages</b></p>
+<p> You can use the <tt><a href="#function_WrapText">WrapText</a></tt> to assure that a text message does not have more than 75 columns by breaking the longer lines between words.</p>
+<p> </p>
+<p> If you are composing a reply to another text message, you can use the <tt><a href="#function_QuoteText">QuoteText</a></tt> function to conveniently mark the text quoted from the original message.</p>
+<p> <b>- Add a plain text message body</b></p>
+<p> If the text of the message that you want to send only contains ASCII characters (7 bits), use the <tt><a href="#function_AddPlainTextPart">AddPlainTextPart</a></tt> function to add the text to the message.</p>
+<p> <b>- Add a text message with non-ASCII characters</b></p>
+<p> If your message text may contains non-ASCII characters (8 bits or more), use the <tt><a href="#function_AddQuotedPrintableTextPart">AddQuotedPrintableTextPart</a></tt> function to add the text to the message.</p>
+<p> </p>
+<p> If the text uses a character set other than <i>ISO-8859-1</i> (ISO Latin 1), set the <tt><a href="#variable_default_charset">default_charset</a></tt> variable to change the default character set.</p>
+<p> <b>- Setting the error message bounce address</b></p>
+<p> This class provides a means to specify the address where error messages should be bounced in case it is not possible to deliver a message. That can be done by setting the header <tt>Return-Path</tt> with the <tt><a href="#function_SetHeader">SetHeader</a></tt> function.</p>
+<p> <b>- Request message receipt notification</b></p>
+<p> If you would like to be receive an notification when a message that is sent is received, just use the <tt><a href="#function_SetHeader">SetHeader</a></tt> function with the <tt>Disposition-Notification-To</tt> header to specify the address to where you want to receive the notification message.</p>
+<p> Keep in mind that this header just expresses that you want to get a receipt notification, but it may be denied or ignored by the recipient, which does not mean the message was not received.</p>
+<p> <b>- Avoding temporary delivery failure warning messages</b></p>
+<p> Sometimes it is not possible to deliver a message immediately due to a networking failure or some other problem. In that case, the mail transfer system usually leaves the message in a queue and keeps retrying to deliver the message until it succeeds or it has reached the limit number of days before it gives up. When it gives up the the message is bounced to the return-path address.</p>
+<p> However some systems send a warning message to the original sender when it is not delivered after the first few hours. This may be an useful notification when the message is sent by a human but it maybe inconvinient when you are sending messages to many users like for instance newsletters or messages to subscribers of mailing lists.</p>
+<p> If you want to hint the mail transfer system to not send temporary delivery failure warning messages, just use the <tt><a href="#function_SetHeader">SetHeader</a></tt> function to set the <tt>Precedence</tt> header to <tt>bulk</tt>.</p>
+<p> Setting this header this way is a convention used by mailing list manager programs precisely for this purpose. It may also hint some mail receiving systems to not send auto-response messages, for instance when the recipient user is away on vaction. However, not all systems are aware of this convention and still send auto-response messages when you set this header.</p>
+<p> <b>- Send the message</b></p>
+<p> Once you have set the message sender, the recipients and added the message text, use the <tt><a href="#function_Send">Send</a></tt> function to send the message. This class uses the PHP function <tt>mail()</tt> to send messages.</p>
+<p> </p>
+<p> If for some reason you need to use a different message delivery method, you may use one of the existing sub-classes that are specialized in delivering messages by connecting to an SMTP server or using directly the programs sendmail and qmail.</p>
+<p> <b>- Add an HTML message body</b></p>
+<p> If you want to send an HTML message you can use the <tt><a href="#function_AddHTMLPart">AddHTMLPart</a></tt> function if it contains only ASCII characters. If it contains non-ASCII characters, you should the <tt><a href="#function_AddQuotedPrintableHTMLPart">AddQuotedPrintableHTMLPart</a></tt> function instead.</p>
+<p> <b>- Add alternative text body for HTML messages</b></p>
+<p> Not every e-mail program can display HTML messages. Therefore, when you send an HTML message, you should also include an alternative text part to be displayed by programs that do not support HTML messages.</p>
+<p> </p>
+<p> This is achieved by composing <tt>multipart/alternative</tt> messages. This type of message is composed by creating the HTML message part with the <tt><a href="#function_CreateHTMLPart">CreateHTMLPart</a></tt> or the <tt><a href="#function_CreateQuotedPrintableHTMLPart">CreateQuotedPrintableHTMLPart</a></tt> functions, then create the alternative text part with the <tt><a href="#function_CreatePlainTextPart">CreatePlainTextPart</a></tt> or the <tt><a href="#function_CreateQuotedPrintableTextPart">CreateQuotedPrintableTextPart</a></tt> functions, and finally use the <tt><a href="#function_AddAlternativeMultipart">AddAlternativeMultipart</a></tt> function to add an assembly of both message parts.</p>
+<p> Note that the text part should be the first to be specified in the array of parts passed to the <tt><a href="#function_AddAlternativeMultipart">AddAlternativeMultipart</a></tt> function, or else it will not appear correctly.</p>
+<p> Despite this procedure adds a little complexity to the process of sending HTML messages, it is the same procedure that is followed by e-mail programs that are used by most people to send HTML messages.</p>
+<p> Therefore, you are strongly recommended to follow the same procedure because some of the modern spam filter programs discard HTML messages without an alternative plain text part, as it constitutes a pattern that identifies messages composed by some of the spam sending programs.</p>
+<p> <b><a name="embed-image">- Embed images in HTML messages</a></b></p>
+<p> One way to show an image in an HTML message is to use <tt>&lt;img&gt;</tt> tag with <tt>src</tt> attribute set to the remote site URL of the image that is meant to be displayed. However, since the message recipient user may not be online when they will check their e-mail, an image referenced this way may not appear.</p>
+<p> Alternatively, an image file can be embedded in an HTML message using <tt>multipart/related</tt> message parts. This type of message part is composed by creating the image file part with the <tt><a href="#function_CreateFilePart">CreateFilePart</a></tt> function.</p>
+<p> Then use the <tt><a href="#function_GetPartContentID">GetPartContentID</a></tt> function the image part identifier text. Prepend the string 'cid:' to this identifier to form a special URL that should be used in the HTML part to reference the image part like this:</p>
+<p> <tt>$image_tag = '&lt;img src=&quot;cid:' . $message_object-&gt;GetPartContentID($image_part) . '&quot;&gt;' ;</tt></p>
+<p> When you have composed the whole HTML document, create the HTML message part with the <tt><a href="#function_CreateHTMLPart">CreateHTMLPart</a></tt> or the <tt><a href="#function_CreateQuotedPrintableHTMLPart">CreateQuotedPrintableHTMLPart</a></tt> functions, and finally use the <tt><a href="#function_CreateRelatedMultipart">CreateRelatedMultipart</a></tt> function to create a message part that can be added to the message with the function <tt><a href="#function_AddAlternativeMultipart">AddAlternativeMultipart</a></tt> like HTML messages with alternative text parts described before.</p>
+<p> Note that the HTML part must be the first listed in the parts array argument that is passed to the function <tt><a href="#function_CreateRelatedMultipart">CreateRelatedMultipart</a></tt>, or else the message may not appear correctly.</p>
+<p> Note also that when you are composing an HTML message with embedded images and an alternative text part, first you need to create the <tt>multipart/alternative</tt> part with the HTML and the text parts using the <tt><a href="#function_CreateAlternativeMultipart">CreateAlternativeMultipart</a></tt> function, and then you add the <tt>multipart/related</tt> part to the message with the <tt><a href="#function_AddRelatedMultipart">AddRelatedMultipart</a></tt> function, passing an array of parts that lists first the <tt>multipart/alternative</tt> part and then the image part created before.</p>
+<p> <b>- Attach files to messages</b></p>
+<p> To send a message with attached files, it is necessary to compose a <tt>multipart/mixed</tt> message. This is a type of message made by a text or HTML part followed by one or more file parts.</p>
+<p> If you add multiple parts to a message, this class implicitly turns it into a <tt>multipart/mixed</tt> message. Therefore you only need to use the function <tt><a href="#function_AddFilePart">AddFilePart</a></tt> for each file that you want to attach and the class will automatically generate the message treating any parts added after the first as attachments.</p>
+<p> <b>- Forward received messages</b></p>
+<p> To forward an e-mail message received from somewhere, just use the function <tt><a href="#function_AddMessagePart">AddMessagePart</a></tt> passing the message complete with the original headers and body data. The message is forwarded as an attachment that most mail programs can display.</p>
+<p> <b>- Sending messages to many recipients (mass or bulk mailing)</b></p>
+<p> Sending messages to many recipients is an activity also known as mass or bulk mailing. There are several alternatives for mass mailing. One way consists on specifying all recipient addresses with the <tt>Bcc</tt> header, separating the addresses with commas (,), or using the <tt><a href="#function_SetMultipleEncodedEmailHeader">SetMultipleEncodedEmailHeader</a></tt> function. This way you only need to send one message that is distributed to all recipients by your mail transfer system.</p>
+<p> Unfortunately, many mail account providers like Hotmail, tend to consider messages sent this way as spam because the real recipients addresses are not visible in <tt>To</tt> of <tt>Cc</tt> headers. So, this method is no longer a good solution these days.</p>
+<p> The alternative is to send a separate message to each recipient by iteratively setting the <tt>To</tt> header with each recipient address and calling the <tt><a href="#function_Send">Send</a></tt> function. This way tends to take too much time and CPU as the number of recipients grow.</p>
+<p> When sending messages to many recipients, call the <tt><a href="#function_SetBulkMail">SetBulkMail</a></tt> function to hint the class to optimize the way it works to make the delivery of the messages more efficient and eventually faster.</p>
+<p> The actual optimizations that are performed depend on the delivery method that is used by this class or any of its subclasses specialized on the different delivery methods that are supported. Check the documentation of the subclass that you use to learn about the optimizations that are performed, if any.</p>
+<p> If you intend to send messages with the same body to all recipients, the class can optimize the generation of the messages and reduce significantly the composition time if you set the <tt><a href="#variable_cache_body">cache_body</a></tt> variable to <tt>1</tt>.</p>
+<p> If you really need to personalize the content of a message part with different text, HTML or file to each recipient, you should use the <tt><a href="#function_ReplacePart">ReplacePart</a></tt> function to avoid as much as possible the overhead of composing a new message to each of the recipients of the mailing.</p>
+<p> If you are sending personalized messages to multiple recipients but the messages include attached or embedded files that are the same for all recipients, you should also set the 'Cached' option of the <tt><a href="#argument_CreateFilePart_file">file</a></tt> parameter of the <tt><a href="#function_CreateFilePart">CreateFilePart</a></tt> function.</p>
+<p> Other than that, take a look at the documentation of the this class sub-classes that may be used in your PHP environment, as these may provide more efficient delivery solutions for mass mailing.</p>
+<p> <b>- Error handling</b></p>
+<p> Most of the functions of this class that may fail, return an error message string that describes the error that has occurred. If there was no error, the functions return an empty string.</p>
+<p> Verifying the return value of all the functions to determine whether there was an error is a tedious task to implement for most developers. To avoid this problem, this class supports <i>cumulative error checking</i>.</p>
+<p> Cumulative error checking means that when an error occurs, the class stores the error message in the <tt><a href="#variable_error">error</a></tt> variable. Then, when another function that may fail is called, it does nothing and immediately returns the same error message.</p>
+<p> This way, the developers only need to check the return value of the last function that is called, which is usually the <tt><a href="#function_Send">Send</a></tt> function. </p>
+<p><a href="#table_of_contents">Table of contents</a></p>
+</ul>
+</ul>
+<hr />
+<ul>
+<h2><li><a name="variables"></a><a name="4.1.1">Variables</a></li></h2>
+<ul>
+<li><tt><a href="#variable_email_regular_expression">email_regular_expression</a></tt></li><br />
+<li><tt><a href="#variable_mailer">mailer</a></tt></li><br />
+<li><tt><a href="#variable_mailer_delivery">mailer_delivery</a></tt></li><br />
+<li><tt><a href="#variable_default_charset">default_charset</a></tt></li><br />
+<li><tt><a href="#variable_line_quote_prefix">line_quote_prefix</a></tt></li><br />
+<li><tt><a href="#variable_break_long_lines">break_long_lines</a></tt></li><br />
+<li><tt><a href="#variable_file_buffer_length">file_buffer_length</a></tt></li><br />
+<li><tt><a href="#variable_debug">debug</a></tt></li><br />
+<li><tt><a href="#variable_cache_body">cache_body</a></tt></li><br />
+<li><tt><a href="#variable_error">error</a></tt></li><br />
+<li><tt><a href="#variable_localhost">localhost</a></tt></li><br />
+<p><a href="#table_of_contents">Table of contents</a></p>
+<h3><a name="variable_email_regular_expression"></a><li><a name="5.2.12">email_regular_expression</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>'^([-!#$%&amp;\'*+./0-9=?A-Z^_`a-z{|}~])+@([-!#$%&amp;\'*+/0-9=?A-Z^_`a-z{|}~]+\\.)+[a-zA-Z]{2,6}$'</tt></p>
+<h3>Purpose</h3>
+<p>Specify the regular expression that is used by the <tt><a href="#function_ValidateEmailAddress">ValidateEmailAddress</a></tt> function to verify whether a given e-mail address may be valid.</p>
+<h3>Usage</h3>
+<p>Do not change this variable unless you have reason to believe that it is rejecting existing e-mail addresses that are known to be valid.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_mailer"></a><li><a name="5.2.13">mailer</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>'http://www.phpclasses.org/mimemessage $Revision: 1.1 $'</tt></p>
+<h3>Purpose</h3>
+<p>Specify the base text that is used identify the name and the version of the class that is used to send the message by setting an implicit the <tt>X-Mailer</tt> message header. This is meant mostly to assist on the debugging of delivery problems.</p>
+<h3>Usage</h3>
+<p>Change this to set another mailer identification string or leave it to an empty string to prevent that the <tt>X-Mailer</tt> header be added to the message.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_mailer_delivery"></a><li><a name="5.2.14">mailer_delivery</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>'mail'</tt></p>
+<h3>Purpose</h3>
+<p>Specify the text that is used to identify the mail delivery class or sub-class. This text is appended to the <tt>X-Mailer</tt> header text defined by the <tt><a href="#variable_mailer">mailer</a></tt> variable.</p>
+<h3>Usage</h3>
+<p>This variable should only be redefined by the different mail delivery sub-classes.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_default_charset"></a><li><a name="5.2.15">default_charset</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>'ISO-8859-1'</tt></p>
+<h3>Purpose</h3>
+<p>Specify the default character set to be assumed for the message headers and body text.</p>
+<h3>Usage</h3>
+<p>Change this variable to the correct character set name if it is different than the default.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_line_quote_prefix"></a><li><a name="5.2.16">line_quote_prefix</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>'&gt; '</tt></p>
+<h3>Purpose</h3>
+<p>Specify the default line quote prefix text used by the <tt><a href="#function_QuoteText">QuoteText</a></tt> function.</p>
+<h3>Usage</h3>
+<p>Change it only if you prefer to quote lines marking them with a different line prefix.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_break_long_lines"></a><li><a name="5.2.17">break_long_lines</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>bool</i></tt></p>
+<h3>Default value</h3>
+<p><tt>1</tt></p>
+<h3>Purpose</h3>
+<p>Determine whether lines exceeding the length limit will be broken by the line break character when using the <tt><a href="#function_WrapText">WrapText</a></tt> function.</p>
+<h3>Usage</h3>
+<p>Change it only if you to avoid breaking long lines without any space characters, like for instance of messages with long URLs.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_file_buffer_length"></a><li><a name="5.2.18">file_buffer_length</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>int</i></tt></p>
+<h3>Default value</h3>
+<p><tt>8000</tt></p>
+<h3>Purpose</h3>
+<p>Specify the length of the buffer that is used to read files in chunks of limited size.</p>
+<h3>Usage</h3>
+<p>The default value may be increased if you have plenty of memory and want to benefit from additional speed when processing the files that are used to compose messages.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_debug"></a><li><a name="5.2.19">debug</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Specify the name of a function that is called whenever an error occurs.</p>
+<h3>Usage</h3>
+<p>If you need to track the errors that may happen during the use of the class, set this variable to the name of a callback function. It should take only one argument that is the error message. When this variable is set to an empty string, no debug callback function is called.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_cache_body"></a><li><a name="5.2.20">cache_body</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>bool</i></tt></p>
+<h3>Default value</h3>
+<p><tt>0</tt></p>
+<h3>Purpose</h3>
+<p>Specify whether the message bodies that are generated by the class before sending, should be cached in memory to be reused on the next message delivery.</p>
+<h3>Usage</h3>
+<p>Set this variable to <tt>1</tt> if you intend to send the a message with the same body to many recipients, so the class avoids the overhead of regenerating messages with the same content.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_error"></a><li><a name="5.2.21">error</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Store the last error return by any function that may fail due to some error.</p>
+<h3>Usage</h3>
+<p>Do not change this variable value unless you intend to clear the error status by setting it to an empty string.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_localhost"></a><li><a name="5.2.22">localhost</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Specify the domain name of the computer sending the message.</p>
+<h3>Usage</h3>
+<p>This value is used as default domain of the sender e-mail address when generating automatic <tt>Message-Id</tt> headers.</p>
+<p><a href="#variables">Variables</a></p>
+<p><a href="#table_of_contents">Table of contents</a></p>
+</ul>
+</ul>
+<hr />
+<ul>
+<h2><li><a name="functions"></a><a name="6.1.1">Functions</a></li></h2>
+<ul>
+<li><tt><a href="#function_ValidateEmailAddress">ValidateEmailAddress</a></tt></li><br />
+<li><tt><a href="#function_WrapText">WrapText</a></tt></li><br />
+<li><tt><a href="#function_CenterText">CenterText</a></tt></li><br />
+<li><tt><a href="#function_Ruler">Ruler</a></tt></li><br />
+<li><tt><a href="#function_QuoteText">QuoteText</a></tt></li><br />
+<li><tt><a href="#function_SetHeader">SetHeader</a></tt></li><br />
+<li><tt><a href="#function_SetEncodedHeader">SetEncodedHeader</a></tt></li><br />
+<li><tt><a href="#function_SetEncodedEmailHeader">SetEncodedEmailHeader</a></tt></li><br />
+<li><tt><a href="#function_SetMultipleEncodedEmailHeader">SetMultipleEncodedEmailHeader</a></tt></li><br />
+<li><tt><a href="#function_ResetMessage">ResetMessage</a></tt></li><br />
+<li><tt><a href="#function_AddPart">AddPart</a></tt></li><br />
+<li><tt><a href="#function_ReplacePart">ReplacePart</a></tt></li><br />
+<li><tt><a href="#function_CreatePlainTextPart">CreatePlainTextPart</a></tt></li><br />
+<li><tt><a href="#function_AddPlainTextPart">AddPlainTextPart</a></tt></li><br />
+<li><tt><a href="#function_CreateQuotedPrintableTextPart">CreateQuotedPrintableTextPart</a></tt></li><br />
+<li><tt><a href="#function_AddQuotedPrintableTextPart">AddQuotedPrintableTextPart</a></tt></li><br />
+<li><tt><a href="#function_CreateHTMLPart">CreateHTMLPart</a></tt></li><br />
+<li><tt><a href="#function_AddHTMLPart">AddHTMLPart</a></tt></li><br />
+<li><tt><a href="#function_CreateQuotedPrintableHTMLPart">CreateQuotedPrintableHTMLPart</a></tt></li><br />
+<li><tt><a href="#function_AddQuotedPrintableHTMLPart">AddQuotedPrintableHTMLPart</a></tt></li><br />
+<li><tt><a href="#function_CreateFilePart">CreateFilePart</a></tt></li><br />
+<li><tt><a href="#function_AddFilePart">AddFilePart</a></tt></li><br />
+<li><tt><a href="#function_CreateMessagePart">CreateMessagePart</a></tt></li><br />
+<li><tt><a href="#function_AddMessagePart">AddMessagePart</a></tt></li><br />
+<li><tt><a href="#function_CreateAlternativeMultipart">CreateAlternativeMultipart</a></tt></li><br />
+<li><tt><a href="#function_AddAlternativeMultipart">AddAlternativeMultipart</a></tt></li><br />
+<li><tt><a href="#function_CreateRelatedMultipart">CreateRelatedMultipart</a></tt></li><br />
+<li><tt><a href="#function_AddRelatedMultipart">AddRelatedMultipart</a></tt></li><br />
+<li><tt><a href="#function_CreateMixedMultipart">CreateMixedMultipart</a></tt></li><br />
+<li><tt><a href="#function_AddMixedMultipart">AddMixedMultipart</a></tt></li><br />
+<li><tt><a href="#function_GetPartContentID">GetPartContentID</a></tt></li><br />
+<li><tt><a href="#function_GetDataURL">GetDataURL</a></tt></li><br />
+<li><tt><a href="#function_Send">Send</a></tt></li><br />
+<li><tt><a href="#function_GetMessage">GetMessage</a></tt></li><br />
+<li><tt><a href="#function_GetMessageSize">GetMessageSize</a></tt></li><br />
+<li><tt><a href="#function_Mail">Mail</a></tt></li><br />
+<li><tt><a href="#function_SetBulkMail">SetBulkMail</a></tt></li><br />
+<p><a href="#table_of_contents">Table of contents</a></p>
+<h3><a name="function_ValidateEmailAddress"></a><li><a name="7.2.38">ValidateEmailAddress</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> ValidateEmailAddress(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_ValidateEmailAddress_address">address</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Determine whether a given e-mail address may be valid.</p>
+<h3>Usage</h3>
+<p>Just pass the e-mail <tt><a href="#argument_ValidateEmailAddress_address">address</a></tt> to be checked as function argument. This function uses the regular expression defined by the <tt><a href="#variable_email_regular_expression">email_regular_expression</a></tt> variable to check the address.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_ValidateEmailAddress_address">address</a></b></tt> - Specify the e-mail address to be validated.</p>
+</ul>
+<h3>Return value</h3>
+<p>The function returns <tt>1</tt> if the specified address may be valid.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_WrapText"></a><li><a name="9.2.39">WrapText</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> WrapText(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_WrapText_text">text</a></tt><tt>,</tt><br />
+<tt><i>int</i> </tt><tt><a href="#argument_WrapText_line_length">line_length</a></tt> [default 0]<tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_WrapText_line_break">line_break</a></tt> [default '']<tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_WrapText_line_prefix">line_prefix</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Split a text in lines that do not exceed the length limit avoiding to break it in the middle of any words.</p>
+<h3>Usage</h3>
+<p>Just pass the <tt><a href="#argument_WrapText_text">text</a></tt> to be wrapped.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_WrapText_text">text</a></b></tt> - Text to be wrapped.</p>
+<p><tt><b><a name="argument_WrapText_line_length">line_length</a></b></tt> - Line length limit. Pass a value different than <tt>0</tt> to use a line length limit other than the default of 75 characters.</p>
+<p><tt><b><a name="argument_WrapText_line_break">line_break</a></b></tt> - Character sequence that is used to break the lines longer than the length limit. Pass a non-empty to use a line breaking sequence other than the default <tt>&quot;\n&quot;</tt>.</p>
+<p><tt><b><a name="argument_WrapText_line_prefix">line_prefix</a></b></tt> - Character sequence that is used to insert in the beginning of all lines.</p>
+</ul>
+<h3>Return value</h3>
+<p>The wrapped text eventually broken in multiple lines that do not exceed the line length limit.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_CenterText"></a><li><a name="11.2.40">CenterText</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> CenterText(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_CenterText_text">text</a></tt><tt>,</tt><br />
+<tt><i>int</i> </tt><tt><a href="#argument_CenterText_line_length">line_length</a></tt> [default 0]</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Center a text in the middle of line.</p>
+<h3>Usage</h3>
+<p>Just pass the <tt><a href="#argument_CenterText_text">text</a></tt> to be centered.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_CenterText_text">text</a></b></tt> - Text to be centered.</p>
+<p><tt><b><a name="argument_CenterText_line_length">line_length</a></b></tt> - Line length limit. Pass a value different than <tt>0</tt> to use a line length limit other than the default of 75 characters.</p>
+</ul>
+<h3>Return value</h3>
+<p>The centered text.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_Ruler"></a><li><a name="13.2.41">Ruler</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> Ruler(</tt><ul>
+<tt><i>int</i> </tt><tt><a href="#argument_Ruler_line_length">line_length</a></tt> [default 0]</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Generate a line with characters that can be displayed as a separator ruler in a text message.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_Ruler_line_length">line_length</a></b></tt> - Line length limit. Pass a value different than <tt>0</tt> to use a line length limit other than the default of 75 characters.</p>
+</ul>
+<h3>Return value</h3>
+<p>The ruler line string.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_QuoteText"></a><li><a name="15.2.42">QuoteText</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> QuoteText(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_QuoteText_text">text</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_QuoteText_quote_prefix">quote_prefix</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Mark a text block to appear like in reply messages composed with common e-mail programs that include text from the original message being replied.</p>
+<h3>Usage</h3>
+<p>Just pass the <tt><a href="#argument_QuoteText_text">text</a></tt> to be marked as a quote.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_QuoteText_text">text</a></b></tt> - Text to be quoted.</p>
+<p><tt><b><a name="argument_QuoteText_quote_prefix">quote_prefix</a></b></tt> - Character sequence that is inserted in the beginning of all lines as a quote mark. Set to an empty string to tell the function to use the default specified by the <tt><a href="#variable_line_quote_prefix">line_quote_prefix</a></tt> variable.</p>
+</ul>
+<h3>Return value</h3>
+<p>The quoted text with all lines prefixed with a quote prefix mark.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_SetHeader"></a><li><a name="17.2.43">SetHeader</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> SetHeader(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_SetHeader_header">header</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_SetHeader_value">value</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_SetHeader_encoding_charset">encoding_charset</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Set the value of a message header.</p>
+<h3>Usage</h3>
+<p>Use this function to set the values of the headers of the message that may be needed. There are some message headers that are automatically set by the class when the message is sent. Others must be defined before sending. Here follows the list of the names of the headers that must be set before sending:</p>
+<p> </p>
+<p> <b>Message subject</b> - <tt>Subject</tt></p>
+<p> <b>Sender address</b> - <tt>From</tt></p>
+<p> <b>Recipient addresses</b> - <tt>To</tt>, <tt>Cc</tt> and <tt>Bcc</tt></p>
+<p> Each of the recipient address headers may contain one or more addresses. Multiple addresses must be separated by a comma and a space.</p>
+<p> <b>Return path address</b> - <tt>Return-Path</tt></p>
+<p> Optional header to specify the address where the message should be bounced in case it is not possible to deliver it.</p>
+<p> In reality this is a virtual header. This means that adding this header to a message will not do anything by itself. However, this class looks for this header to adjust the message delivery procedure in such way that the Message Transfer Agent (MTA) system is hinted to direct any bounced messages to the address specified by this header.</p>
+<p> Note that under some systems there is no way to set the return path address programmatically. This is the case when using the PHP <tt>mail()</tt> function under Windows where the return path address should be set in the <tt>php.ini</tt> configuration file.</p>
+<p> Keep in mind that even when it is possible to set the return path address, the systems of some e-mail account providers may ignore this address and send bounced messages to the sender address. This is a bug of those systems. There is nothing that can be done other than complain.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_SetHeader_header">header</a></b></tt> - Name of the header.</p>
+<p><tt><b><a name="argument_SetHeader_value">value</a></b></tt> - Text value for the header.</p>
+<p><tt><b><a name="argument_SetHeader_encoding_charset">encoding_charset</a></b></tt> - Character set used in the header value. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_SetEncodedHeader"></a><li><a name="19.2.44">SetEncodedHeader</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> SetEncodedHeader(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_SetEncodedHeader_header">header</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_SetEncodedHeader_value">value</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_SetEncodedHeader_encoding_charset">encoding_charset</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>The same as the <tt><a href="#function_SetHeader">SetHeader</a></tt> function assuming the default character set specified by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+<h3>Usage</h3>
+<p>See the <tt><a href="#function_SetHeader">SetHeader</a></tt> function.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_SetEncodedHeader_header">header</a></b></tt> - Name of the header.</p>
+<p><tt><b><a name="argument_SetEncodedHeader_value">value</a></b></tt> - Text value for the header.</p>
+<p><tt><b><a name="argument_SetEncodedHeader_encoding_charset">encoding_charset</a></b></tt> - Character set used in the header value. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_SetEncodedEmailHeader"></a><li><a name="21.2.45">SetEncodedEmailHeader</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> SetEncodedEmailHeader(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_SetEncodedEmailHeader_header">header</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_SetEncodedEmailHeader_address">address</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_SetEncodedEmailHeader_name">name</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_SetEncodedEmailHeader_encoding_charset">encoding_charset</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Set the value of an header that is meant to represent the e-mail address of a person or entity with a known name. This is meant mostly to set the <tt>From</tt>, <tt>To</tt>, <tt>Cc</tt> and <tt>Bcc</tt> headers.</p>
+<h3>Usage</h3>
+<p>Use this function like the <tt><a href="#function_SetHeader">SetHeader</a></tt> specifying the e-mail <tt><a href="#argument_SetEncodedEmailHeader_address">address</a></tt> as header value and also specifying the <tt><a href="#argument_SetEncodedEmailHeader_name">name</a></tt> of the known person or entity.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_SetEncodedEmailHeader_header">header</a></b></tt> - Name of the header.</p>
+<p><tt><b><a name="argument_SetEncodedEmailHeader_address">address</a></b></tt> - E-mail address value.</p>
+<p><tt><b><a name="argument_SetEncodedEmailHeader_name">name</a></b></tt> - Person or entity name associated with the specified e-mail address.</p>
+<p><tt><b><a name="argument_SetEncodedEmailHeader_encoding_charset">encoding_charset</a></b></tt> - Character set used in the header value. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_SetMultipleEncodedEmailHeader"></a><li><a name="23.2.46">SetMultipleEncodedEmailHeader</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> SetMultipleEncodedEmailHeader(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_SetMultipleEncodedEmailHeader_header">header</a></tt><tt>,</tt><br />
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_SetMultipleEncodedEmailHeader_addresses">addresses</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_SetMultipleEncodedEmailHeader_encoding_charset">encoding_charset</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Set the value of an header that is meant to represent a list of e-mail addresses of names of people or entities. This is meant mostly to set the <tt>To</tt>, <tt>Cc</tt> and <tt>Bcc</tt> headers.</p>
+<h3>Usage</h3>
+<p>Use this function specifying the <tt><a href="#argument_SetMultipleEncodedEmailHeader_header">header</a></tt> and all the <tt><a href="#argument_SetMultipleEncodedEmailHeader_addresses">addresses</a></tt> in an associative array that should have the email addresses as entry indexes and the name of the respective people or entities as entry values.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_SetMultipleEncodedEmailHeader_header">header</a></b></tt> - Name of the header.</p>
+<p><tt><b><a name="argument_SetMultipleEncodedEmailHeader_addresses">addresses</a></b></tt> - List of all email addresses and associated person or entity names.</p>
+<p><tt><b><a name="argument_SetMultipleEncodedEmailHeader_encoding_charset">encoding_charset</a></b></tt> - Character set used in the header value. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<h3>Example</h3>
+<p></p>
+<pre>$message_object-&gt;SetMultipleEncodedEmailHeader('Bcc', array(
+  'peter@gabriel.org' =&gt; 'Peter Gabriel',
+  'paul@simon.net' =&gt; 'Paul Simon',
+  'mary@chain.com' =&gt; 'Mary Chain'
+));</pre>
+<p></p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_ResetMessage"></a><li><a name="25.2.47">ResetMessage</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i></i> ResetMessage(</tt><tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Restore the content of the message to the initial state when the class object is created, i.e. without any headers or body parts.</p>
+<h3>Usage</h3>
+<p>Use this function if you want to start composing a completely new message.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_AddPart"></a><li><a name="25.2.48">AddPart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> AddPart(</tt><ul>
+<tt><i>int</i> </tt><tt><a href="#argument_AddPart_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Add a previously created part to the message.</p>
+<h3>Usage</h3>
+<p>Use any of the functions to create standalone message parts and then use this function to add them to the message.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_AddPart_part">part</a></b></tt> - Number of the part as returned by the function that originally created it.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_ReplacePart"></a><li><a name="27.2.49">ReplacePart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> ReplacePart(</tt><ul>
+<tt><i>int</i> </tt><tt><a href="#argument_ReplacePart_old_part">old_part</a></tt><tt>,</tt><br />
+<tt><i>int</i> </tt><tt><a href="#argument_ReplacePart_new_part">new_part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Replace a message part already added to the message with a newly created part. The replaced part gets the definition of the replacing part. The replacing part is discarded and its part number becomes free for creation of a new part.</p>
+<h3>Usage</h3>
+<p>Use one of the functions to create message parts and then pass the returned part numbers to this function.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_ReplacePart_old_part">old_part</a></b></tt> - Number of the previously added part.</p>
+<p><tt><b><a name="argument_ReplacePart_new_part">new_part</a></b></tt> - Number of the replacing part.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_CreatePlainTextPart"></a><li><a name="29.2.50">CreatePlainTextPart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> CreatePlainTextPart(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_CreatePlainTextPart_text">text</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_CreatePlainTextPart_charset">charset</a></tt><tt>,</tt><br />
+<tt>(output) <i>int &amp;</i> </tt><tt><a href="#argument_CreatePlainTextPart_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Create a plain text message part.</p>
+<h3>Usage</h3>
+<p>Pass an ASCII (7 bits) <tt><a href="#argument_CreatePlainTextPart_text">text</a></tt> string and get the created part number in the <tt><a href="#argument_CreatePlainTextPart_part">part</a></tt> that is returned by reference.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_CreatePlainTextPart_text">text</a></b></tt> - Text of the message part to create.</p>
+<p><tt><b><a name="argument_CreatePlainTextPart_charset">charset</a></b></tt> - Character set used in the part text. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+<p><tt><b><a name="argument_CreatePlainTextPart_part">part</a></b></tt> - Number of the created part that is returned by reference.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_AddPlainTextPart"></a><li><a name="31.2.51">AddPlainTextPart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> AddPlainTextPart(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_AddPlainTextPart_text">text</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_AddPlainTextPart_charset">charset</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Add a plain text part to the message.</p>
+<h3>Usage</h3>
+<p>Pass an ASCII (7 bits) <tt><a href="#argument_AddPlainTextPart_text">text</a></tt> string.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_AddPlainTextPart_text">text</a></b></tt> - Text of the message part to add.</p>
+<p><tt><b><a name="argument_AddPlainTextPart_charset">charset</a></b></tt> - Character set used in the part text. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_CreateQuotedPrintableTextPart"></a><li><a name="33.2.52">CreateQuotedPrintableTextPart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> CreateQuotedPrintableTextPart(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_CreateQuotedPrintableTextPart_text">text</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_CreateQuotedPrintableTextPart_charset">charset</a></tt><tt>,</tt><br />
+<tt>(output) <i>int &amp;</i> </tt><tt><a href="#argument_CreateQuotedPrintableTextPart_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Create a text message part that may contain non-ASCII characters (8 bits or more).</p>
+<h3>Usage</h3>
+<p>Pass a <tt><a href="#argument_CreateQuotedPrintableTextPart_text">text</a></tt> string and get the created part number in the <tt><a href="#argument_CreateQuotedPrintableTextPart_part">part</a></tt> that is returned by reference.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_CreateQuotedPrintableTextPart_text">text</a></b></tt> - Text of the message part to create.</p>
+<p><tt><b><a name="argument_CreateQuotedPrintableTextPart_charset">charset</a></b></tt> - Character set used in the part text. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+<p><tt><b><a name="argument_CreateQuotedPrintableTextPart_part">part</a></b></tt> - Number of the created part that is returned by reference.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_AddQuotedPrintableTextPart"></a><li><a name="35.2.53">AddQuotedPrintableTextPart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> AddQuotedPrintableTextPart(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_AddQuotedPrintableTextPart_text">text</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_AddQuotedPrintableTextPart_charset">charset</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Add a text part to the message that may contain non-ASCII characters (8 bits or more).</p>
+<h3>Usage</h3>
+<p>Pass a <tt><a href="#argument_AddQuotedPrintableTextPart_text">text</a></tt> string.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_AddQuotedPrintableTextPart_text">text</a></b></tt> - Text of the message part to create.</p>
+<p><tt><b><a name="argument_AddQuotedPrintableTextPart_charset">charset</a></b></tt> - Character set used in the part text. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_CreateHTMLPart"></a><li><a name="37.2.54">CreateHTMLPart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> CreateHTMLPart(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_CreateHTMLPart_html">html</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_CreateHTMLPart_charset">charset</a></tt><tt>,</tt><br />
+<tt>(output) <i>int &amp;</i> </tt><tt><a href="#argument_CreateHTMLPart_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Create an HTML message part only with ASCII characters (7 bit).</p>
+<h3>Usage</h3>
+<p>Pass an ASCII (7 bits) <tt><a href="#argument_CreateHTMLPart_html">html</a></tt> text string and get the created part number in the <tt><a href="#argument_CreateHTMLPart_part">part</a></tt> that is returned by reference.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_CreateHTMLPart_html">html</a></b></tt> - HTML of the message part to create.</p>
+<p><tt><b><a name="argument_CreateHTMLPart_charset">charset</a></b></tt> - Character set used in the part text. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+<p><tt><b><a name="argument_CreateHTMLPart_part">part</a></b></tt> - Number of the created part that is returned by reference.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_AddHTMLPart"></a><li><a name="39.2.55">AddHTMLPart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> AddHTMLPart(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_AddHTMLPart_html">html</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_AddHTMLPart_charset">charset</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Add an HTML part to the message only with ASCII characters.</p>
+<h3>Usage</h3>
+<p>Pass an <tt><a href="#argument_AddHTMLPart_html">html</a></tt> text string.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_AddHTMLPart_html">html</a></b></tt> - HTML of the message part to create.</p>
+<p><tt><b><a name="argument_AddHTMLPart_charset">charset</a></b></tt> - Character set used in the part text. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_CreateQuotedPrintableHTMLPart"></a><li><a name="41.2.56">CreateQuotedPrintableHTMLPart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> CreateQuotedPrintableHTMLPart(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_CreateQuotedPrintableHTMLPart_html">html</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_CreateQuotedPrintableHTMLPart_charset">charset</a></tt><tt>,</tt><br />
+<tt>(output) <i>int &amp;</i> </tt><tt><a href="#argument_CreateQuotedPrintableHTMLPart_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Create an HTML message part that may contain non-ASCII characters (8 bits or more).</p>
+<h3>Usage</h3>
+<p>Pass a <tt><a href="#argument_CreateQuotedPrintableHTMLPart_html">html</a></tt> text string and get the created part number in the <tt><a href="#argument_CreateQuotedPrintableHTMLPart_part">part</a></tt> that is returned by reference.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_CreateQuotedPrintableHTMLPart_html">html</a></b></tt> - HTML of the message part to create.</p>
+<p><tt><b><a name="argument_CreateQuotedPrintableHTMLPart_charset">charset</a></b></tt> - Character set used in the part text. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+<p><tt><b><a name="argument_CreateQuotedPrintableHTMLPart_part">part</a></b></tt> - Number of the created part that is returned by reference.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_AddQuotedPrintableHTMLPart"></a><li><a name="43.2.57">AddQuotedPrintableHTMLPart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> AddQuotedPrintableHTMLPart(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_AddQuotedPrintableHTMLPart_html">html</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_AddQuotedPrintableHTMLPart_charset">charset</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Add an HTML part to the message that may contain non-ASCII characters (8 bits or more).</p>
+<h3>Usage</h3>
+<p>Pass a <tt><a href="#argument_AddQuotedPrintableHTMLPart_html">html</a></tt> text string.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_AddQuotedPrintableHTMLPart_html">html</a></b></tt> - HTML of the message part to create.</p>
+<p><tt><b><a name="argument_AddQuotedPrintableHTMLPart_charset">charset</a></b></tt> - Character set used in the part text. If it is set to an empty string, it is assumed the character set defined by the <tt><a href="#variable_default_charset">default_charset</a></tt> variable.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_CreateFilePart"></a><li><a name="45.2.58">CreateFilePart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> CreateFilePart(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_CreateFilePart_file">file</a></tt><tt>,</tt><br />
+<tt>(output) <i>int &amp;</i> </tt><tt><a href="#argument_CreateFilePart_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Create a message part to be handled as a file.</p>
+<h3>Usage</h3>
+<p>Pass a <tt><a href="#argument_CreateFilePart_file">file</a></tt> definition associative array and get the created part number in the <tt><a href="#argument_CreateFilePart_part">part</a></tt> that is returned by reference.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_CreateFilePart_file">file</a></b></tt> - Associative array to specify parameters that describe the file part. Here follows the list of supported parameters that should be used as indexes of the array:</p>
+<p> <tt>FileName</tt></p>
+<p> Name of the file from which the part data will be read when the message is generated. It may be a remote URL as long as your PHP installation is configured to allow accessing remote files with the <tt>fopen()</tt> function.</p>
+<p> <tt>Data</tt></p>
+<p> String that specifies the data of the file. This should be used as alternative data source to <tt>FileName</tt> for passing data available in memory, like for instance files stored in a database that was queried dynamically and the file contents was fetched into a string variable.</p>
+<p> <tt>Name</tt></p>
+<p> Name of the file that will appear in the message. If this parameter is missing the base name of the <tt>FileName</tt> parameter is used, if present.</p>
+<p> <tt>Content-Type</tt></p>
+<p> Content type of the part: <tt>text/plain</tt> for text, <tt>text/html</tt> for HTML, <tt>image/gif</tt> for GIF images, etc..</p>
+<p> There is one special type named <tt>automatic/name</tt> that may be used to tell the class to try to guess the content type from the file name. Many file types are recognized from the file name extension. If the file name extension is not recognized, the default for binary data <tt>application/octet-stream</tt> is assumed.</p>
+<p> <tt>Disposition</tt></p>
+<p> Information to whether this file part is meant to be used as a file <tt>attachment</tt> or as a part meant to be displayed <tt>inline</tt>, eventually integrated with another related part.</p>
+<p> <tt>Cache</tt></p>
+<p> Boolean flag that indicates that this message part should be cached when generating the message body. Use only when sending many messages to multiple recipients, but this part does not change between each of the messages that are sent.</p>
+<p> Note that it is also not worth using this option when setting the <tt><a href="#variable_cache_body">cache_body</a></tt>, as that variable makes the class cache the whole message body and the internal message parts will not be rebuilt.</p>
+<p><tt><b><a name="argument_CreateFilePart_part">part</a></b></tt> - Number of the created part that is returned by reference.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_AddFilePart"></a><li><a name="47.2.59">AddFilePart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> AddFilePart(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_AddFilePart_file">file</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Add a message part to be handled as a file.</p>
+<h3>Usage</h3>
+<p>Pass a <tt><a href="#argument_AddFilePart_file">file</a></tt> definition associative array.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_AddFilePart_file">file</a></b></tt> - Associative array to specify parameters that describe the file part. See the <tt><a href="#argument_CreateFilePart_file">file</a></tt> argument description of the <tt><a href="#function_CreateFilePart">CreateFilePart</a></tt> function for an explanation about the supported file parameters.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_CreateMessagePart"></a><li><a name="49.2.60">CreateMessagePart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> CreateMessagePart(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_CreateMessagePart_message">message</a></tt><tt>,</tt><br />
+<tt>(output) <i>int &amp;</i> </tt><tt><a href="#argument_CreateMessagePart_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Create a message part to encapsulate another message. This is usually meant to create an attachment that contains a message that was received and is being forwarded intact with the original the headers and body data.</p>
+<h3>Usage</h3>
+<p>This function should be used like the <tt><a href="#function_CreateFilePart">CreateFilePart</a></tt> function, passing the same parameters to the <tt><a href="#argument_CreateMessagePart_message">message</a></tt> argument.</p>
+<p> The message to be encapsulated can be specified either as an existing file with the <tt>FileName</tt> parameter, or as string of data in memory with the <tt>Data</tt> parameter.</p>
+<p> The <tt>Content-Type</tt> and <tt>Disposition</tt> file parameters do not need to be specified because they are overridden by this function.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_CreateMessagePart_message">message</a></b></tt> - Associative array that specifies definition parameters of the message file part.</p>
+<p><tt><b><a name="argument_CreateMessagePart_part">part</a></b></tt> - Number of the created part that is returned by reference.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_AddMessagePart"></a><li><a name="51.2.61">AddMessagePart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> AddMessagePart(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_AddMessagePart_message">message</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Add a message part that encapsulates another message. This is usually meant to add an attachment that contains a message that was received and is being forwarded intact with the original the headers and body data.</p>
+<h3>Usage</h3>
+<p>This function should be used like the <tt><a href="#function_AddFilePart">AddFilePart</a></tt> function, passing the same parameters to the <tt><a href="#argument_AddMessagePart_message">message</a></tt> argument. See the <tt><a href="#function_CreateFilePart">CreateFilePart</a></tt> function for more details.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_AddMessagePart_message">message</a></b></tt> - Associative array that specifies definition parameters of the message file part.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_CreateAlternativeMultipart"></a><li><a name="53.2.62">CreateAlternativeMultipart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> CreateAlternativeMultipart(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_CreateAlternativeMultipart_parts">parts</a></tt><tt>,</tt><br />
+<tt>(output) <i>int &amp;</i> </tt><tt><a href="#argument_CreateAlternativeMultipart_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Create a message part composed of multiple parts that can be displayed by the recipient e-mail program in alternative formats.</p>
+<p> This is usually meant to create HTML messages with an alternative text part to be displayed by programs that cannot display HTML messages.</p>
+<h3>Usage</h3>
+<p>Create all the alternative message parts that are going to be sent and pass their numbers to the <tt><a href="#argument_CreateAlternativeMultipart_parts">parts</a></tt> array argument.</p>
+<p> The least sophisticated part, usually the text part, should appear first in the parts array because the e-mail programs that support displaying more sophisticated message parts will pick the last part in the message that is supported.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_CreateAlternativeMultipart_parts">parts</a></b></tt> - Array with the numbers with all the alternative parts.</p>
+<p><tt><b><a name="argument_CreateAlternativeMultipart_part">part</a></b></tt> - Number of the created part that is returned by reference.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_AddAlternativeMultipart"></a><li><a name="55.2.63">AddAlternativeMultipart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> AddAlternativeMultipart(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_AddAlternativeMultipart_parts">parts</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Add a message part composed of multiple parts that can be displayed by the recipient e-mail program in alternative formats.</p>
+<p> This is usually meant to create HTML messages with an alternative text part to be displayed by programs that cannot display HTML messages.</p>
+<h3>Usage</h3>
+<p>Create all the alternative message parts that are going to be sent and pass their numbers to the <tt><a href="#argument_AddAlternativeMultipart_parts">parts</a></tt> array argument.</p>
+<p> The least sophisticated part, usually the text part, should appear first in the parts array because the e-mail programs that support displaying more sophisticated message parts will pick the last part in the message that is supported.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_AddAlternativeMultipart_parts">parts</a></b></tt> - Array with the numbers with all the alternative parts.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_CreateRelatedMultipart"></a><li><a name="57.2.64">CreateRelatedMultipart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> CreateRelatedMultipart(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_CreateRelatedMultipart_parts">parts</a></tt><tt>,</tt><br />
+<tt>(output) <i>int &amp;</i> </tt><tt><a href="#argument_CreateRelatedMultipart_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Create a message part that groups several related parts.</p>
+<p> This is usually meant to group an HTML message part with images or other types of files that should be embedded in the same message and be displayed as a single part by the recipient e-mail program.</p>
+<h3>Usage</h3>
+<p>Create all the related message parts that are going to be sent and pass their numbers to the <tt><a href="#argument_CreateRelatedMultipart_parts">parts</a></tt> array argument.</p>
+<p> When using this function to group an HTML message with embedded images or other related files, make sure that the HTML part number is the first listed in the <tt><a href="#argument_CreateRelatedMultipart_parts">parts</a></tt> array argument, or else the message may not appear correctly.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_CreateRelatedMultipart_parts">parts</a></b></tt> - Array with the numbers with all the related parts.</p>
+<p><tt><b><a name="argument_CreateRelatedMultipart_part">part</a></b></tt> - Number of the created part that is returned by reference.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_AddRelatedMultipart"></a><li><a name="59.2.65">AddRelatedMultipart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> AddRelatedMultipart(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_AddRelatedMultipart_parts">parts</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Add a message part that groups several related parts.</p>
+<p> This is usually meant to group an HTML message part with images or other types of files that should be embedded in the same message and be displayed as a single part by the recipient e-mail program.</p>
+<h3>Usage</h3>
+<p>Create all the related message parts that are going to be sent and pass their numbers to the <tt><a href="#argument_AddRelatedMultipart_parts">parts</a></tt> array argument.</p>
+<p> When using this function to group an HTML message with embedded images or other related files, make sure that the HTML part number is the first listed in the <tt><a href="#argument_AddRelatedMultipart_parts">parts</a></tt> array argument, or else the message may not appear correctly.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_AddRelatedMultipart_parts">parts</a></b></tt> - Array with the numbers with all the related parts.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_CreateMixedMultipart"></a><li><a name="61.2.66">CreateMixedMultipart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> CreateMixedMultipart(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_CreateMixedMultipart_parts">parts</a></tt><tt>,</tt><br />
+<tt>(output) <i>int &amp;</i> </tt><tt><a href="#argument_CreateMixedMultipart_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Create a message part that groups several independent parts.</p>
+<p> Usually this is meant compose messages with one or more file attachments. However, it is not necessary to use this function as the class implicitly creates a <tt>multipart/mixed</tt> message when more than one part is added to the message.</p>
+<h3>Usage</h3>
+<p>Create all the independent message parts that are going to be sent and pass their numbers to the <tt><a href="#argument_CreateMixedMultipart_parts">parts</a></tt> array argument.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_CreateMixedMultipart_parts">parts</a></b></tt> - Array with the numbers with all the related parts.</p>
+<p><tt><b><a name="argument_CreateMixedMultipart_part">part</a></b></tt> - Number of the created part that is returned by reference.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_AddMixedMultipart"></a><li><a name="63.2.67">AddMixedMultipart</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> AddMixedMultipart(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_AddMixedMultipart_parts">parts</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Add a message part that groups several independent parts.</p>
+<p> Usually this is meant compose messages with one or more file attachments. However, it is not necessary to use this function as the class implicitly creates a <tt>multipart/mixed</tt> message when more than one part is added to the message.</p>
+<h3>Usage</h3>
+<p>Create all the independent message parts that are going to be sent and pass their numbers to the <tt><a href="#argument_AddMixedMultipart_parts">parts</a></tt> array argument.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_AddMixedMultipart_parts">parts</a></b></tt> - Array with the numbers with all the related parts.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_GetPartContentID"></a><li><a name="65.2.68">GetPartContentID</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> GetPartContentID(</tt><ul>
+<tt><i>int</i> </tt><tt><a href="#argument_GetPartContentID_part">part</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Retrieve the content identifier associated to a given message part.</p>
+<h3>Usage</h3>
+<p>Create a message part and pass its number to the <tt><a href="#argument_GetPartContentID_part">part</a></tt> argument.</p>
+<p> This function is usually meant to create an URL that can be used in an HTML message part to reference related parts like images, CSS (Cascaded Style Sheets), or any other type of files related to the HTML part that are embedded in the same message as part of a <tt>multipart/related</tt> composite part.</p>
+<p> To use the part content identifier returned by this function you need to prepend the string <tt>'cid:'</tt> to form a special URL that can be used in the HTML document this part file.</p>
+<p> You may read more about using this function in the class usage section about <a href="#embed-image">embedding images in HTML messages</a>.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_GetPartContentID_part">part</a></b></tt> - Number of the part as returned by the function that originally created it.</p>
+</ul>
+<h3>Return value</h3>
+<p>The content identifier text string.</p>
+<p> If it is specified an invalid message part, this function returns an empty string.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_GetDataURL"></a><li><a name="67.2.69">GetDataURL</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> GetDataURL(</tt><ul>
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_GetDataURL_file">file</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Generate a <tt>data:</tt> URL according to the <a href="http://www.ietf.org/rfc/rfc2397.txt">RFC 2397</a> suitable for using in HTML messages to represent an image or other type of file on which the data is directly embedded in the HTML code instead of being fetched from a separate file or remote URL.</p>
+<p> Note that not all e-mail programs are capable of displaying images or other types of files embedded in HTML messages this way.</p>
+<h3>Usage</h3>
+<p>Pass a <tt><a href="#argument_GetDataURL_file">file</a></tt> part definition array like for the <tt><a href="#function_CreateFilePart">CreateFilePart</a></tt> function.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_GetDataURL_file">file</a></b></tt> - File definition.</p>
+</ul>
+<h3>Return value</h3>
+<p>The <tt>data:</tt> representing the described file or an empty string in case there was an error.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_Send"></a><li><a name="69.2.70">Send</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> Send(</tt><tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Send a composed message.</p>
+<h3>Usage</h3>
+<p>Use this function after you have set the necessary message headers and added the message body parts.</p>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_GetMessage"></a><li><a name="69.2.71">GetMessage</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> GetMessage(</tt><ul>
+<tt>(output) <i>string &amp;</i> </tt><tt><a href="#argument_GetMessage_message">message</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Get the whole message headers and body.</p>
+<h3>Usage</h3>
+<p>Use this function to retrieve the message headers and body without sending it.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_GetMessage_message">message</a></b></tt> - Reference to a string variable to store the text of the message headers and body.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_GetMessageSize"></a><li><a name="71.2.72">GetMessageSize</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> GetMessageSize(</tt><ul>
+<tt>(output) <i>string &amp;</i> </tt><tt><a href="#argument_GetMessageSize_message">message</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Get the size of the whole message headers and body.</p>
+<h3>Usage</h3>
+<p>Use this function to retrieve the size in bytes of the message headers and body without sending it.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_GetMessageSize_message">message</a></b></tt> - Reference to an integer variable to store the size of the message headers and body.</p>
+</ul>
+<h3>Return value</h3>
+<p>An error message in case there was an error or an empty string otherwise. This return value may be safely ignored if the function parameters are set correctly.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_Mail"></a><li><a name="73.2.73">Mail</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> Mail(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_Mail_to">to</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_Mail_subject">subject</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_Mail_message">message</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_Mail_additional_headers">additional_headers</a></tt> [default '']<tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_Mail_additional_parameters">additional_parameters</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Emulate the PHP <tt>mail()</tt> function by composing and sending a message given the same arguments.</p>
+<p> This is mostly meant to provide a solution for sending messages with alternative delivery methods provided by this class sub-classes. It uses the same arguments as the PHP <tt>mail()</tt> function. Developers willing to use this alternative do not need to change much their scripts that already use the <tt>mail()</tt> function.</p>
+<h3>Usage</h3>
+<p>Use this function passing the same arguments as to PHP <tt><a href="http://www.php.net/manual/en/function.mail.php">mail()</a></tt> function.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_Mail_to">to</a></b></tt> - Recipient e-mail address.</p>
+<p><tt><b><a name="argument_Mail_subject">subject</a></b></tt> - Message subject.</p>
+<p><tt><b><a name="argument_Mail_message">message</a></b></tt> - Message body.</p>
+<p><tt><b><a name="argument_Mail_additional_headers">additional_headers</a></b></tt> - Text string headers and the respective values. There should be one header and value per line with line breaks separating each line.</p>
+<p><tt><b><a name="argument_Mail_additional_parameters">additional_parameters</a></b></tt> - Text string with additional parameters. In the original PHP <tt>mail()</tt> function these were actual switches to be passed in the sendmail program invocation command line. This function only supports the <tt>-f</tt> switch followed by an e-mail address meant to specify the message bounce return path address.</p>
+</ul>
+<h3>Return value</h3>
+<p>If this function succeeds, it returns <tt>1</tt>.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_SetBulkMail"></a><li><a name="75.2.74">SetBulkMail</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> SetBulkMail(</tt><ul>
+<tt><i>bool</i> </tt><tt><a href="#argument_SetBulkMail_on">on</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Hint the class to adjust itself in order to send individual messages to many recipients more efficiently.</p>
+<h3>Usage</h3>
+<p>Call this function before starting sending messages to many recipients passing 1 to the <tt><a href="#argument_SetBulkMail_on">on</a></tt> argument. Then call this function again after the bulk mailing delivery has ended passing passing 1 to the <tt><a href="#argument_SetBulkMail_on">on</a></tt> argument.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_SetBulkMail_on">on</a></b></tt> - Boolean flag that indicates whether a bulk delivery is going to start if set to 1 or that the bulk delivery has ended if set to 0.</p>
+</ul>
+<h3>Return value</h3>
+<p>If this function succeeds, it returns <tt>1</tt>.</p>
+<p><a href="#functions">Functions</a></p>
+<p><a href="#table_of_contents">Table of contents</a></p>
+</ul>
+</ul>
+
+<hr />
+<address>Manuel Lemos (<a href="mailto:mlemos-at-acm.org">mlemos-at-acm.org</a>)</address>
+</body>
+</html>
