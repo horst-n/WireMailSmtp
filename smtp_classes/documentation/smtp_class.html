@@ -1,0 +1,584 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Class: Sending e-mail messages via SMTP protocol</title>
+</head>
+<body>
+<center><h1>Class: Sending e-mail messages via SMTP protocol</h1></center>
+<hr />
+<ul>
+<p><b>Version:</b> <tt>@(#) $Id: smtp_class.html,v 1.1 2014/03/03 12:28:31 horst Exp $</tt></p>
+<h2><a name="table_of_contents">Contents</a></h2>
+<ul>
+<li><a href="#2.1.1">Summary</a></li>
+<ul>
+<li><a href="#3.2.0">Name</a></li>
+<li><a href="#3.2.0.0">Author</a></li>
+<li><a href="#3.2.0.1">Copyright</a></li>
+<li><a href="#3.2.0.2">Version</a></li>
+<li><a href="#3.2.0.3">Purpose</a></li>
+<li><a href="#3.2.0.4">Translation</a></li>
+<li><a href="#3.2.0.5">Support</a></li>
+<li><a href="#3.2.0.6">Usage</a></li>
+</ul>
+<li><a href="#4.1.1">Variables</a></li>
+<ul>
+<li><a href="#5.2.29">user</a></li>
+<li><a href="#5.2.30">realm</a></li>
+<li><a href="#5.2.31">password</a></li>
+<li><a href="#5.2.32">workstation</a></li>
+<li><a href="#5.2.33">authentication_mechanism</a></li>
+<li><a href="#5.2.34">host_name</a></li>
+<li><a href="#5.2.35">host_port</a></li>
+<li><a href="#5.2.36">socks_host_name</a></li>
+<li><a href="#5.2.37">socks_host_port</a></li>
+<li><a href="#5.2.38">socks_version</a></li>
+<li><a href="#5.2.39">http_proxy_host_name</a></li>
+<li><a href="#5.2.40">http_proxy_host_port</a></li>
+<li><a href="#5.2.41">user_agent</a></li>
+<li><a href="#5.2.42">ssl</a></li>
+<li><a href="#5.2.43">start_tls</a></li>
+<li><a href="#5.2.44">localhost</a></li>
+<li><a href="#5.2.45">timeout</a></li>
+<li><a href="#5.2.46">data_timeout</a></li>
+<li><a href="#5.2.47">direct_delivery</a></li>
+<li><a href="#5.2.48">error</a></li>
+<li><a href="#5.2.49">debug</a></li>
+<li><a href="#5.2.50">html_debug</a></li>
+<li><a href="#5.2.51">esmtp</a></li>
+<li><a href="#5.2.52">esmtp_extensions</a></li>
+<li><a href="#5.2.53">exclude_address</a></li>
+<li><a href="#5.2.54">getmxrr</a></li>
+<li><a href="#5.2.55">pop3_auth_host</a></li>
+<li><a href="#5.2.56">pop3_auth_port</a></li>
+</ul>
+<li><a href="#6.1.1">Functions</a></li>
+<ul>
+<li><a href="#7.2.11">Connect</a></li>
+<li><a href="#9.2.12">MailFrom</a></li>
+<li><a href="#11.2.13">SetRecipient</a></li>
+<li><a href="#13.2.14">StartData</a></li>
+<li><a href="#13.2.15">PrepareData</a></li>
+<li><a href="#15.2.16">SendData</a></li>
+<li><a href="#17.2.17">EndSendingData</a></li>
+<li><a href="#17.2.18">ResetConnection</a></li>
+<li><a href="#17.2.19">Disconnect</a></li>
+<li><a href="#19.2.20">SendMessage</a></li>
+</ul>
+</ul>
+<p><a href="#table_of_contents">Top of the table of contents</a></p>
+</ul>
+<hr />
+<ul>
+<h2><li><a name="2.1.1">Summary</a></li></h2>
+<ul>
+<h3><a name="3.2.0">Name</a></h3>
+<p>Sending e-mail messages via SMTP protocol</p>
+<h3><a name="3.2.0.0">Author</a></h3>
+<p>Manuel Lemos (<a href="mailto:mlemos-at-acm.org">mlemos-at-acm.org</a>)</p>
+<h3><a name="3.2.0.1">Copyright</a></h3>
+<p>Copyright (C) Manuel Lemos 1999-2011</p>
+<h3><a name="3.2.0.2">Version</a></h3>
+<p>@(#) $Id: smtp_class.html,v 1.1 2014/03/03 12:28:31 horst Exp $</p>
+<h3><a name="3.2.0.3">Purpose</a></h3>
+<p>Sending e-mail messages via SMTP protocol</p>
+<h3><a name="3.2.0.4">Translation</a></h3>
+<p>If you are interested in translating the documentation of this class to your own idiom, please <a href="mailto:mlemos-at-acm.org">contact the author</a>.</p>
+<h3><a name="3.2.0.5">Support</a></h3>
+<p>Technical support for using this class may be obtained in the <tt>smtpclass</tt> support forum. Just go to the support forum pages page to browse the forum archives and post support request messages:</p>
+<p> <a href="http://www.phpclasses.org/discuss/package/14/">http://www.phpclasses.org/discuss/package/14/</a></p>
+<h3><a name="3.2.0.6">Usage</a></h3>
+<p>To use this class just create a new object, set any variables to configure its options and call the <tt><a href="#function_SendMessage">SendMessage</a></tt> function to send a message.</p>
+<p>It is not recommended that you use this class alone unless you have deep understanding of Internet mail standards on how to compose compliant e-mail messages. Instead, use the <a href="http://www.phpclasses.org/mimemessage">MIME message composing and sending class</a> and its sub-class SMTP message together with this SMTP class to properly compose e-mail messages, so your messages are not discarded for not being correctly composed.</p>
+<p><a href="#table_of_contents">Table of contents</a></p>
+</ul>
+</ul>
+<hr />
+<ul>
+<h2><li><a name="variables"></a><a name="4.1.1">Variables</a></li></h2>
+<ul>
+<li><tt><a href="#variable_user">user</a></tt></li><br />
+<li><tt><a href="#variable_realm">realm</a></tt></li><br />
+<li><tt><a href="#variable_password">password</a></tt></li><br />
+<li><tt><a href="#variable_workstation">workstation</a></tt></li><br />
+<li><tt><a href="#variable_authentication_mechanism">authentication_mechanism</a></tt></li><br />
+<li><tt><a href="#variable_host_name">host_name</a></tt></li><br />
+<li><tt><a href="#variable_host_port">host_port</a></tt></li><br />
+<li><tt><a href="#variable_socks_host_name">socks_host_name</a></tt></li><br />
+<li><tt><a href="#variable_socks_host_port">socks_host_port</a></tt></li><br />
+<li><tt><a href="#variable_socks_version">socks_version</a></tt></li><br />
+<li><tt><a href="#variable_http_proxy_host_name">http_proxy_host_name</a></tt></li><br />
+<li><tt><a href="#variable_http_proxy_host_port">http_proxy_host_port</a></tt></li><br />
+<li><tt><a href="#variable_user_agent">user_agent</a></tt></li><br />
+<li><tt><a href="#variable_ssl">ssl</a></tt></li><br />
+<li><tt><a href="#variable_start_tls">start_tls</a></tt></li><br />
+<li><tt><a href="#variable_localhost">localhost</a></tt></li><br />
+<li><tt><a href="#variable_timeout">timeout</a></tt></li><br />
+<li><tt><a href="#variable_data_timeout">data_timeout</a></tt></li><br />
+<li><tt><a href="#variable_direct_delivery">direct_delivery</a></tt></li><br />
+<li><tt><a href="#variable_error">error</a></tt></li><br />
+<li><tt><a href="#variable_debug">debug</a></tt></li><br />
+<li><tt><a href="#variable_html_debug">html_debug</a></tt></li><br />
+<li><tt><a href="#variable_esmtp">esmtp</a></tt></li><br />
+<li><tt><a href="#variable_esmtp_extensions">esmtp_extensions</a></tt></li><br />
+<li><tt><a href="#variable_exclude_address">exclude_address</a></tt></li><br />
+<li><tt><a href="#variable_getmxrr">getmxrr</a></tt></li><br />
+<li><tt><a href="#variable_pop3_auth_host">pop3_auth_host</a></tt></li><br />
+<li><tt><a href="#variable_pop3_auth_port">pop3_auth_port</a></tt></li><br />
+<p><a href="#table_of_contents">Table of contents</a></p>
+<h3><a name="variable_user"></a><li><a name="5.2.29">user</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Define the authorized user when sending messages to a SMTP server.</p>
+<h3>Usage</h3>
+<p>Set this variable to the user name when the SMTP server requires authentication.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_realm"></a><li><a name="5.2.30">realm</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Define the authentication realm when sending messages to a SMTP server.</p>
+<h3>Usage</h3>
+<p>Set this variable when the SMTP server requires authentication and if more than one authentication realm is supported.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_password"></a><li><a name="5.2.31">password</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Define the authorized user password when sending messages to a SMTP server.</p>
+<h3>Usage</h3>
+<p>Set this variable to the user password when the SMTP server requires authentication.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_workstation"></a><li><a name="5.2.32">workstation</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Define the client workstation name when sending messages to a SMTP server.</p>
+<h3>Usage</h3>
+<p>Set this variable to the client workstation when the SMTP server requires authentication identifiying the origin workstation name.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_authentication_mechanism"></a><li><a name="5.2.33">authentication_mechanism</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Force the use of a specific authentication mechanism.</p>
+<h3>Usage</h3>
+<p>Set it to an empty string to let the class determine the authentication mechanism to use automatically based on the supported mechanisms by the server and by the SASL client library classes.</p>
+<p> Set this variable to a specific mechanism name if you want to override the automatic authentication mechanism selection.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_host_name"></a><li><a name="5.2.34">host_name</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Define the SMTP server host name.</p>
+<h3>Usage</h3>
+<p>Set to the host name of the SMTP server to which you want to relay the messages.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_host_port"></a><li><a name="5.2.35">host_port</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>int</i></tt></p>
+<h3>Default value</h3>
+<p><tt>25</tt></p>
+<h3>Purpose</h3>
+<p>Define the SMTP server host port.</p>
+<h3>Usage</h3>
+<p>Set to the TCP port of the SMTP server host to connect.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_socks_host_name"></a><li><a name="5.2.36">socks_host_name</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Define the SOCKS server host name.</p>
+<h3>Usage</h3>
+<p>Set to the SOCKS server host name through which the SMTP connection should be routed. Leave it empty if you do not want the connections to be established through a SOCKS server.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_socks_host_port"></a><li><a name="5.2.37">socks_host_port</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>int</i></tt></p>
+<h3>Default value</h3>
+<p><tt>1080</tt></p>
+<h3>Purpose</h3>
+<p>Define the SOCKS server host port.</p>
+<h3>Usage</h3>
+<p>Set to the port of the SOCKS server host through which the the SMTP connection should be routed.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_socks_version"></a><li><a name="5.2.38">socks_version</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>'5'</tt></p>
+<h3>Purpose</h3>
+<p>Set the SOCKS protocol version.</p>
+<h3>Usage</h3>
+<p>Change this value if SOCKS server you want to use is listening to a different port.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_http_proxy_host_name"></a><li><a name="5.2.39">http_proxy_host_name</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Define the HTTP proxy server host name.</p>
+<h3>Usage</h3>
+<p>Set to the HTTP proxy server host name through which the SMTP connection should be routed. Leave it empty if you do not want the connections to be established through an HTTP proxy.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_http_proxy_host_port"></a><li><a name="5.2.40">http_proxy_host_port</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>int</i></tt></p>
+<h3>Default value</h3>
+<p><tt>80</tt></p>
+<h3>Purpose</h3>
+<p>Define the HTTP proxy server host port.</p>
+<h3>Usage</h3>
+<p>Set to the port of the HTTP proxy server host through which the SMTP connection should be routed.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_user_agent"></a><li><a name="5.2.41">user_agent</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>'SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.1 $)'</tt></p>
+<h3>Purpose</h3>
+<p>Set the user agent used when connecting via an HTTP proxy.</p>
+<h3>Usage</h3>
+<p>Change this value only if for some reason you want emulate a certain e-mail client.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_ssl"></a><li><a name="5.2.42">ssl</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>bool</i></tt></p>
+<h3>Default value</h3>
+<p><tt>0</tt></p>
+<h3>Purpose</h3>
+<p>Define whether the connection to the SMTP server should be established securely using SSL protocol.</p>
+<h3>Usage</h3>
+<p>Set to 1 if the SMTP server requires secure connections using SSL protocol.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_start_tls"></a><li><a name="5.2.43">start_tls</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>bool</i></tt></p>
+<h3>Default value</h3>
+<p><tt>0</tt></p>
+<h3>Purpose</h3>
+<p>Define whether the connection to the SMTP server should use encryption after the connection is established using TLS protocol.</p>
+<h3>Usage</h3>
+<p>Set to 1 if the SMTP server requires that authentication be done securely starting the TLS protocol after the connection is established.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_localhost"></a><li><a name="5.2.44">localhost</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Name of the local host computer</p>
+<h3>Usage</h3>
+<p>Set to the name of the computer connecting to the SMTP server from the local network.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_timeout"></a><li><a name="5.2.45">timeout</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>int</i></tt></p>
+<h3>Default value</h3>
+<p><tt>0</tt></p>
+<h3>Purpose</h3>
+<p>Specify the connection timeout period in seconds.</p>
+<h3>Usage</h3>
+<p>Leave it set to 0 if you want the connection attempts to wait forever. Change this value if for some reason the timeout period seems insufficient or otherwise it seems too long.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_data_timeout"></a><li><a name="5.2.46">data_timeout</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>int</i></tt></p>
+<h3>Default value</h3>
+<p><tt>0</tt></p>
+<h3>Purpose</h3>
+<p>Specify the timeout period in seconds to wait for data from the server.</p>
+<h3>Usage</h3>
+<p>Leave it set to 0 if you want to use the same value defined in the <tt><a href="#variable_timeout">timeout</a></tt> variable. Change this value if for some reason the default data timeout period seems insufficient or otherwise it seems too long.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_direct_delivery"></a><li><a name="5.2.47">direct_delivery</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>bool</i></tt></p>
+<h3>Default value</h3>
+<p><tt>0</tt></p>
+<h3>Purpose</h3>
+<p>Boolean flag that indicates whether the message should be sent in direct delivery mode, i.e. the message is sent to the SMTP server associated to the domain of the recipient instead of relaying to the server specified by the <tt><a href="#variable_host_name">host_name</a></tt> variable.</p>
+<h3>Usage</h3>
+<p>Set this to <tt>1</tt> if you want to send urgent messages directly to the recipient domain SMTP server.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_error"></a><li><a name="5.2.48">error</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Message that describes the error when a call to a class function fails.</p>
+<h3>Usage</h3>
+<p>Check this variable when an error occurs to understand what happened.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_debug"></a><li><a name="5.2.49">debug</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>bool</i></tt></p>
+<h3>Default value</h3>
+<p><tt>0</tt></p>
+<h3>Purpose</h3>
+<p>Specify whether it is necessary to output SMTP connection debug information.</p>
+<h3>Usage</h3>
+<p>Set this variable to <tt>1</tt> if you need to see the progress of the SMTP connection and protocol dialog when you need to understand the reason for delivery problems.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_html_debug"></a><li><a name="5.2.50">html_debug</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>bool</i></tt></p>
+<h3>Default value</h3>
+<p><tt>0</tt></p>
+<h3>Purpose</h3>
+<p>Specify whether the debug information should be outputted in HTML format.</p>
+<h3>Usage</h3>
+<p>Set this variable to <tt>1</tt> if you need to see the debug output in a Web page.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_esmtp"></a><li><a name="5.2.51">esmtp</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>bool</i></tt></p>
+<h3>Default value</h3>
+<p><tt>1</tt></p>
+<h3>Purpose</h3>
+<p>Specify whether the class should attempt to use ESMTP extensions supported by the server.</p>
+<h3>Usage</h3>
+<p>Set this variable to <tt>0</tt> if for some reason you want to avoid benefitting from ESMTP extensions.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_esmtp_extensions"></a><li><a name="5.2.52">esmtp_extensions</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>array</i></tt></p>
+<h3>Default value</h3>
+<p><tt>array()</tt></p>
+<h3>Purpose</h3>
+<p>Associative array with the list of ESMTP extensions supported by the SMTP server.</p>
+<h3>Usage</h3>
+<p>Check this variable after connecting to the SMTP server to determine which ESMTP extensions are supported.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_exclude_address"></a><li><a name="5.2.53">exclude_address</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Specify an address that should be considered invalid when resolving host name addresses.</p>
+<h3>Usage</h3>
+<p>In some networks any domain name that does not exist is resolved as a sub-domain of the default local domain. If the DNS is configured in such way that it always resolves any sub-domain of the default local domain to a given address, it is hard to determine whether a given domain does not exist.</p>
+<p> If your network is configured this way, you may set this variable to the address that all sub-domains of the default local domain resolves, so the class can assume that such address is invalid.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_getmxrr"></a><li><a name="5.2.54">getmxrr</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>'getmxrr'</tt></p>
+<h3>Purpose</h3>
+<p>Specify the name of the function that is called to determine the SMTP server address of a given domain.</p>
+<h3>Usage</h3>
+<p>Change this to a working replacement of the PHP <tt>getmxrr()</tt> function if this is not working in your system and you want to send messages in direct delivery mode.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_pop3_auth_host"></a><li><a name="5.2.55">pop3_auth_host</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>string</i></tt></p>
+<h3>Default value</h3>
+<p><tt>''</tt></p>
+<h3>Purpose</h3>
+<p>Specify the server address for POP3 based authentication.</p>
+<h3>Usage</h3>
+<p>Set this variable to the address of the POP3 server if the SMTP server requires POP3 based authentication.</p>
+<p><a href="#variables">Variables</a></p>
+<h3><a name="variable_pop3_auth_port"></a><li><a name="5.2.56">pop3_auth_port</a></li></h3>
+<h3>Type</h3>
+<p><tt><i>int</i></tt></p>
+<h3>Default value</h3>
+<p><tt>110</tt></p>
+<h3>Purpose</h3>
+<p>Specify the server port for POP3 based authentication.</p>
+<h3>Usage</h3>
+<p>Set this variable to the port of the POP3 server if the SMTP server requires POP3 based authentication.</p>
+<p><a href="#variables">Variables</a></p>
+<p><a href="#table_of_contents">Table of contents</a></p>
+</ul>
+</ul>
+<hr />
+<ul>
+<h2><li><a name="functions"></a><a name="6.1.1">Functions</a></li></h2>
+<ul>
+<li><tt><a href="#function_Connect">Connect</a></tt></li><br />
+<li><tt><a href="#function_MailFrom">MailFrom</a></tt></li><br />
+<li><tt><a href="#function_SetRecipient">SetRecipient</a></tt></li><br />
+<li><tt><a href="#function_StartData">StartData</a></tt></li><br />
+<li><tt><a href="#function_PrepareData">PrepareData</a></tt></li><br />
+<li><tt><a href="#function_SendData">SendData</a></tt></li><br />
+<li><tt><a href="#function_EndSendingData">EndSendingData</a></tt></li><br />
+<li><tt><a href="#function_ResetConnection">ResetConnection</a></tt></li><br />
+<li><tt><a href="#function_Disconnect">Disconnect</a></tt></li><br />
+<li><tt><a href="#function_SendMessage">SendMessage</a></tt></li><br />
+<p><a href="#table_of_contents">Table of contents</a></p>
+<h3><a name="function_Connect"></a><li><a name="7.2.11">Connect</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> Connect(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_Connect_domain">domain</a></tt> [default '']</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Connect to an SMTP server.</p>
+<h3>Usage</h3>
+<p>Call this function as first step to send e-mail messages.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_Connect_domain">domain</a></b></tt> - Specify the domain of the recipient when using the direct delivery mode.</p>
+</ul>
+<h3>Return value</h3>
+<p>The function returns <tt>1</tt> if the connection is successfully established.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_MailFrom"></a><li><a name="9.2.12">MailFrom</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> MailFrom(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_MailFrom_sender">sender</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Set the address of the message sender.</p>
+<h3>Usage</h3>
+<p>Call this function right after establishing a connection with the <tt><a href="#function_Connect">Connect</a></tt> function.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_MailFrom_sender">sender</a></b></tt> - E-mail address of the sender.</p>
+</ul>
+<h3>Return value</h3>
+<p>The function returns <tt>1</tt> if the sender address is successfully set.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_SetRecipient"></a><li><a name="11.2.13">SetRecipient</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> SetRecipient(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_SetRecipient_recipient">recipient</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Set the address of a message recipient.</p>
+<h3>Usage</h3>
+<p>Call this function repeatedly for each recipient right after setting the message sender with the <tt><a href="#function_MailFrom">MailFrom</a></tt> function.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_SetRecipient_recipient">recipient</a></b></tt> - E-mail address of a recipient.</p>
+</ul>
+<h3>Return value</h3>
+<p>The function returns <tt>1</tt> if the recipient address is successfully set.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_StartData"></a><li><a name="13.2.14">StartData</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> StartData(</tt><tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Tell the SMTP server that the message data will start being sent.</p>
+<h3>Usage</h3>
+<p>Call this function right after you are done setting all the message recipients with the <tt><a href="#function_SetRecipient">SetRecipient</a></tt> function.</p>
+<h3>Return value</h3>
+<p>The function returns <tt>1</tt> if the server is ready to start receiving the message data.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_PrepareData"></a><li><a name="13.2.15">PrepareData</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>string</i> PrepareData(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_PrepareData_data">data</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Prepare message data to normalize line breaks and escaping lines that contain single dots.</p>
+<h3>Usage</h3>
+<p>Call this function if the message data you want to send may contain line breaks that are not the &quot;\r\n&quot; sequence or it may contain lines that just have a single dot.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_PrepareData_data">data</a></b></tt> - Message data to be prepared.</p>
+</ul>
+<h3>Return value</h3>
+<p>Resulting normalized messages data.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_SendData"></a><li><a name="15.2.16">SendData</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> SendData(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_SendData_data">data</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Send message data.</p>
+<h3>Usage</h3>
+<p>Call this function repeatedly for all message data blocks to be sent right after	start sending message data with the <tt><a href="#function_StartData">StartData</a></tt> function.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_SendData_data">data</a></b></tt> - Message data to be sent.</p>
+</ul>
+<h3>Return value</h3>
+<p>The function returns <tt>1</tt> if the message data was sent to the SMTP server successfully.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_EndSendingData"></a><li><a name="17.2.17">EndSendingData</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> EndSendingData(</tt><tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Tell the server that all the message data was sent.</p>
+<h3>Usage</h3>
+<p>Call this function when you are done with sending the message data with the	<tt><a href="#function_SendData">SendData</a></tt> function.</p>
+<h3>Return value</h3>
+<p>The function returns <tt>1</tt> if the server accepted the message.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_ResetConnection"></a><li><a name="17.2.18">ResetConnection</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> ResetConnection(</tt><tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Reset an already established SMTP connection to the initial state.</p>
+<h3>Usage</h3>
+<p>Call this function when there was an error sending a message and you need to skip to sending another message without disconnecting.</p>
+<h3>Return value</h3>
+<p>The function returns <tt>1</tt> if the connection was resetted successfully.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_Disconnect"></a><li><a name="17.2.19">Disconnect</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> Disconnect(</tt><ul>
+<tt><i>bool</i> </tt><tt><a href="#argument_Disconnect_quit">quit</a></tt> [default 1]</ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Terminate a previously opened connection.</p>
+<h3>Usage</h3>
+<p>Call this function after you are done sending your messages.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_Disconnect_quit">quit</a></b></tt> - Boolean option that tells whether the class should perform the final connection quit handshake, or just close the connection without waiting.</p>
+</ul>
+<h3>Return value</h3>
+<p>The function returns <tt>1</tt> if the connection was successfully closed.</p>
+<p><a href="#functions">Functions</a></p>
+<h3><a name="function_SendMessage"></a><li><a name="19.2.20">SendMessage</a></li></h3>
+<h3>Synopsis</h3>
+<p><tt><i>bool</i> SendMessage(</tt><ul>
+<tt><i>string</i> </tt><tt><a href="#argument_SendMessage_sender">sender</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_SendMessage_recipients">recipients</a></tt><tt>,</tt><br />
+<tt>(input and output) <i>array</i> </tt><tt><a href="#argument_SendMessage_headers">headers</a></tt><tt>,</tt><br />
+<tt><i>string</i> </tt><tt><a href="#argument_SendMessage_body">body</a></tt></ul>
+<tt>)</tt></p>
+<h3>Purpose</h3>
+<p>Send a message in a single call.</p>
+<h3>Usage</h3>
+<p>Call this function if you want to send a single messages to a small number of recipients in a single call.</p>
+<h3>Arguments</h3>
+<ul>
+<p><tt><b><a name="argument_SendMessage_sender">sender</a></b></tt> - E-mail address of the sender.</p>
+<p><tt><b><a name="argument_SendMessage_recipients">recipients</a></b></tt> - Array with a list of the e-mail addresses of the recipients of the message.</p>
+<p><tt><b><a name="argument_SendMessage_headers">headers</a></b></tt> - Array with a list of the header lines of the message.</p>
+<p><tt><b><a name="argument_SendMessage_body">body</a></b></tt> - Body data of the message.</p>
+</ul>
+<h3>Return value</h3>
+<p>The function returns <tt>1</tt> if the message was sent successfully.</p>
+<p><a href="#functions">Functions</a></p>
+<p><a href="#table_of_contents">Table of contents</a></p>
+</ul>
+</ul>
+
+<hr />
+<address>Manuel Lemos (<a href="mailto:mlemos-at-acm.org">mlemos-at-acm.org</a>)</address>
+</body>
+</html>
