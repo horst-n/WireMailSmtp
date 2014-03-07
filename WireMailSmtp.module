@@ -1,0 +1,718 @@
+<?php
+
+/**
+ * SMTP Mailer WireMail module
+ *
+ * This module extends the WireMail base class and integrate the EmailMessage- and the SMTP-Library
+ * from M. Lemos (http://www.phpclasses.org/browse/author/1.html) into ProcessWire.
+ *
+ *
+ * @copyright Copyright (c) 2014, Horst Nogajski
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License, version 2
+ *
+ * ProcessWire 2.x
+ * Copyright (C) 2013 by Ryan Cramer
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ *
+ * http://www.processwire.com
+ *
+**/
+
+
+
+
+
+/**
+ * $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtp.module,v $
+ * $Id: WireMailSmtp.module,v 1.10 2014/03/06 19:43:51 horst Exp $
+**/
+
+
+class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
+
+
+	public static function getModuleInfo() {
+		return array(
+			'title'     => 'Wire Mail SMTP',
+			'version'   => 5,
+			'summary'   => "extends WireMail, uses SMTP Protocol, provides: TO, CC, BCC, Attachments, Priority, DispositionNotification, protocols PLAIN - SSL - START_TLS, Bulksending, ... \nIn a future version personalized message sending will be supported too.",
+			'href'      => '', //'http://mods.pw/???',
+			'author'    => 'horst',
+			'singular'  => false,
+			'autoload'  => false
+			);
+	}
+
+
+	/**
+	 * Name of activity/error log files without extension (.txt)
+	 *
+	 */
+	const LOG_FILENAME_ACTIVITY = 'wiremailsmtp_activity';
+	const LOG_FILENAME_ERROR = 'wiremailsmtp_errors';
+
+
+	private $smtp = null;
+	private $maildata = array();
+
+
+	/**
+	 * Mail properties
+	 *
+	 */
+	protected $mail = array(
+		'to' => array(),                 // to addresses - associative: both key and value are email (to prevent dups)
+		'toName' => array(),             // to names - associative: indexed by 'to' email address, may be blank/null for any email
+		'cc' => array(),
+		'ccName' => array(),
+		'bcc' => array(),
+		'from' => '',
+		'fromName' => '',
+		'priority' => '',
+		'dispositionNotification' => '',
+		'subject' => '',
+		'body' => '',
+		'bodyHTML' => '',
+		'addSignature' => '',
+		'attachments' => array(),
+		'header' => array(),
+		'sendSingle' => false,
+		'sendBulk' => false
+		);
+
+
+    /**
+	 * Default settings used by this module
+	 *
+	 * @return array
+	 */
+    static public function getDefaultData() {
+        return array(
+			'default_charset'          => 'UTF-8',
+			'localhost'                => '',     // this computer address
+			'smtp_host'                => '',     // SMTP server address
+			'smtp_port'                => 25,     // SMTP server port
+			'smtp_ssl'                 => 0,      // SMTP use SSL ?
+			'smtp_start_tls'           => 0,      // SMTP use START_TLS ?
+			'smtp_user'                => '',     // SMTP user name
+			'smtp_password'            => '',     // SMTP password
+			'smtp_password2'           => '',     // SMTP password
+			'clear_smtp_password'      => '',     // SMTP password
+			'realm'                    => '',     // Authentication realm or domain
+			'workstation'              => '',     // Workstation for NTLM authentication
+			'authentication_mechanism' => '',     // SASL authentication mechanism
+			'smtp_debug'               => 0,      // debug smtp server communication?
+			'smtp_html_debug'          => 0,      // debug smtp server communication in HTML?
+			'sender_name'              => '',     // From: the senders name
+			'sender_email'             => '',     // From: the senders email address
+			'sender_reply'             => '',     // Reply-To: optional email address
+			'sender_errors_to'         => '',     // Errors-To: optional email address
+			'sender_signature'         => '',     // a Signature Text, like Contact Data and / or Confidentiality Notices
+			'send_sender_signature'    => 1,      // when the signature should be send: with every mail | only when the default Email is the sender | only when explicitly called via the API
+			'extra_headers'            => '',     // optional Custom-Meta-Headers
+			'valid_recipients'         => ''      // email addresses of valid recipients. String that we convert to array at runtime.
+			);
+	}
+
+
+
+	/**
+	 * Bundle module settings back into an array for WireMailSmtpAdaptor
+	 *
+	 */
+	public function getSettings() {
+		$settings = array();
+		foreach(self::getDefaultData() as $key => $value) {
+			$k = $key;
+			$v = $this->$key;
+			if($key === 'valid_recipients') {
+				// convert multi-line textarea value to array of emails
+				$emails = array();
+				foreach(explode("\n", $this->valid_recipients) as $email) {
+					if(trim($email)=='') continue;
+					$emails[] = trim($email);
+				}
+				$settings[$key] = $emails;
+				continue;
+			}
+			if($key === 'extra_headers') {
+				// convert multi-line textarea value to array of Key => Value pairs
+				$extraHeaders = array();
+				foreach(explode("\n", $this->get('extra_headers')) as $extraHeader) {
+					if(trim($extraHeader)=='') continue;
+					$tmp = explode('=', $extraHeader);
+					if(!is_array($tmp) || count($tmp)!=2) continue;
+					$extraHeaders[$tmp[0]] = $tmp[1];
+				}
+				$settings[$key] = $extraHeaders;
+				continue;
+			}
+			$settings[$k] = $this->$key;
+		}
+		return $settings;
+	}
+
+
+
+	/**
+	 * Populate default settings
+	 *
+	 */
+	public function __construct() {
+		$this->mail['header']['X-Mailer'] = "ProcessWire/" . $this->className();
+		foreach(self::getDefaultData() as $key => $value) $this->$key = $value;
+	}
+
+
+	/**
+	 * Initialize the module and setup hooks
+	 *
+	 */
+	public function init() {
+		require_once(wire('config')->paths->WireMailSmtp . 'WireMailSmtpAdaptor.php');
+		$this->smtp = new hnsmtp($this->getSettings());
+	}
+
+
+	//	public function ready() {
+	//	}
+
+
+	public function __destruct() {
+		if($this->smtp) $this->smtp->close();
+		unset($this->smtp);
+	}
+
+
+
+
+
+	/**
+	 * Save activity message to log file
+	 *
+	 */
+	public function logActivity($message) {
+		$this->log->save( self::LOG_FILENAME_ACTIVITY , $message);
+	}
+
+
+	/**
+	 * Save error message to log file
+	 *
+	 */
+	public function logError($message) {
+		$this->log->save( self::LOG_FILENAME_ERROR , $message);
+	}
+
+
+
+
+
+	/**
+	 * Build a form allowing configuration of this Module
+	 *
+	 */
+	static public function getModuleConfigInputfields(array $data) {
+		$localhost = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
+		$data = array_merge(self::getDefaultData(), array('localhost'=>$localhost), $data);
+
+//	    // special handling for SMTP password
+//	    // seen by @teppo's SwiftMailer
+//	    if(isset($data['smtp_password2'])) {
+//	        $data['smtp_password'] = $data['smtp_password2'];
+//	        unset($data['smtp_password2'], $data['clear_smtp_password']);
+//	        wire('modules')->saveModuleConfigData('WireMailSmtp', $data);
+//	    }
+//	    elseif(isset($data['clear_smtp_password']) && $data['clear_smtp_password']) {
+//	        unset($data['smtp_password'], $data['smtp_password2'], $data['clear_smtp_password']);
+//	        wire('modules')->saveModuleConfigData('WireMailSmtp', $data);
+//	    }
+//	    else {
+//			unset($data['smtp_password2'], $data['clear_smtp_password']);
+//			wire('modules')->saveModuleConfigData('WireMailSmtp', $data);
+//	    }
+
+		require_once(dirname(__FILE__) . '/WireMailSmtpConfig.php');
+		$c = new WireMailSmtpConfig();
+		return $c->getConfig($data);
+	}
+
+
+	/**
+	 * Return a ready-to-use copy of the Adaptor
+	 *
+	 */
+	public function getAdaptor() {
+		return $this;
+	}
+
+
+
+
+
+
+
+
+	/**
+	 * Set the email cc address
+	 *
+	 * Each added email addresses appends to any addresses already supplied, unless
+	 * you specify NULL as the email address, in which case it clears them all.
+	 *
+	 * @param string|array|null $email Specify any ONE of the following:
+	 *	1. Single email address or "User Name <user@example.com>" string.
+	 * 	2. CSV string of #1.
+	 * 	3. Non-associative array of #1.
+	 * 	4. Associative array of (email => name)
+	 *	5. NULL (default value, to clear out any previously set values)
+	 * @param string $name Optionally provide a FROM name, applicable
+	 *	only when specifying #1 (single email) for the first argument.
+	 * @return this
+	 * @throws WireException if any provided emails were invalid
+	 *
+	 */
+	public function cc($email = null, $name = null) {
+
+		if(is_null($email)) {
+			// clear existing values
+			$this->mail['cc'] = array();
+			$this->mail['ccName'] = array();
+			return $this;
+		}
+
+		$emails = is_array($email) ? $email : explode(',', $email);
+
+		foreach($emails as $key => $value) {
+
+			$toName = '';
+			if(is_string($key)) {
+				// associative array
+				// email provided as $key, and $toName as value
+				$toEmail = $key;
+				$toName = $value;
+
+			} else if(strpos($value, '<') !== false && strpos($value, '>') !== false) {
+				// toName supplied as: "User Name <user@example.com"
+				list($toEmail, $toName) = $this->extractEmailAndName($value);
+
+			} else {
+				// just an email address, possibly with name as a function arg
+				$toEmail = $value;
+			}
+
+			if(empty($toName)) $toName = $name; // use function arg if not overwritten
+			$toEmail = $this->sanitizeEmail($toEmail);
+			$this->mail['cc'][$toEmail] = $toEmail;
+			$this->mail['ccName'][$toEmail] = $this->sanitizeHeader($toName);
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * Set the email bcc address
+	 *
+	 * Each added email addresses appends to any addresses already supplied, unless
+	 * you specify NULL as the email address, in which case it clears them all.
+	 *
+	 * @param string|array|null $email Specify any ONE of the following:
+	 *	1. Single email address or "User Name <user@example.com>" string.
+	 * 	2. CSV string of #1.
+	 * 	3. Non-associative array of #1.
+	 * 	4. Associative array of (email => name)
+	 *	5. NULL (default value, to clear out any previously set values)
+	 * @param string $name Optionally provide a FROM name, applicable
+	 *	only when specifying #1 (single email) for the first argument.
+	 * @return this
+	 * @throws WireException if any provided emails were invalid
+	 *
+	 */
+	public function bcc($email = null, $name = null) {
+
+		// a BCC Name isn't used, because BCC addresses by it's nature aren't kept in email messages
+		// we leave it here for compatibilty with TO and CC methods
+
+		if(is_null($email)) {
+			// clear existing values
+			$this->mail['bcc'] = array();
+			return $this;
+		}
+
+		$emails = is_array($email) ? $email : explode(',', $email);
+
+		foreach($emails as $key => $value) {
+
+			$toName = '';
+			if(is_string($key)) {
+				// associative array
+				// email provided as $key, and $toName as value
+				$toEmail = $key;
+				$toName = $value;
+
+			} else if(strpos($value, '<') !== false && strpos($value, '>') !== false) {
+				// toName supplied as: "User Name <user@example.com"
+				list($toEmail, $toName) = $this->extractEmailAndName($value);
+
+			} else {
+				// just an email address, possibly with name as a function arg
+				$toEmail = $value;
+			}
+
+			if(empty($toName)) $toName = $name; // use function arg if not overwritten
+			$toEmail = $this->sanitizeEmail($toEmail);
+			$this->mail['bcc'][$toEmail] = $toEmail;
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * Set the 'cc' name
+	 *
+	 * It is preferable to do this with the cc() method, but this is provided to ensure that
+	 * all properties can be set with direct access, i.e. $mailer->toName = 'User Name';
+	 *
+ 	 * This sets the 'to name' for whatever the last added 'cc' email address was.
+	 *
+	 * @param string
+	 * @return this
+	 * @throws WireException if you attempt to set a toName before a to email.
+	 *
+	 */
+	public function ccName($name) {
+		$emails = $this->mail['cc'];
+		if(!count($emails)) throw new WireException("Please set a 'cc' address before setting a name.");
+		$email = end($emails);
+		$this->mail['ccName'][$email] = $this->sanitizeHeader($name);
+		return $this;
+	}
+
+
+	/**
+	 * Set the email from address
+	 *
+	 * @param string Must be a single email address or "User Name <user@example.com>" string.
+	 * @param string|null An optional FROM name (same as setting/calling fromName)
+	 * @return this
+	 * @throws WireException if provided email was invalid
+	 *
+	 */
+	public function from($email='', $name = null) {
+		if(is_null($name)) list($email, $name) = $this->extractEmailAndName($email);
+        if(empty($email)) {
+			$email = $this->sender_email;
+			$name = $this->sender_name;
+        }
+		if($name) $this->mail['fromName'] = $this->sanitizeHeader($name);
+		$this->mail['from'] = $email;
+		return $this;
+	}
+
+
+
+
+
+
+
+
+
+
+
+	/**
+	 * Set the email priority headers
+	 *
+	 * @param number 1 | 2 | 3 | 4 | 5   ( 1 = highest | 3 = normal / default | 5 = lowest )
+	 * @return this
+	 *
+	 */
+	public function priority($number) {
+		$this->mail['priority'] = $number;
+		return $this;
+	}
+
+
+	/**
+	 * Request a Disposition Notification
+	 *
+	 * @return this
+	 *
+	 */
+	public function dispositionNotification($request=true) {
+		$this->mail['dispositionNotification'] = (bool)$request;
+		return $this;
+	}
+	public function notification($request=true) {
+		return $this->dispositionNotification($request);
+	}
+
+
+	/**
+	 * Add attachments to the email
+	 *
+	 * @param array|string filename  the filename(s) of the attachment(s), no URL(s)!
+	 * @return this
+	 *
+	 */
+	public function attachments($filenames) {
+		if(!is_array($filenames)) $filenames = explode(',', $filenames);
+		foreach($filenames as $filename) {
+			$this->mail['attachments'][] = trim($filename);
+		}
+		return $this;
+	}
+	public function attachment($filename) {
+		return $this->attachments($filename);
+	}
+
+
+	public function addSignature($add=true) {
+		$this->mail['addSignature'] = (bool)$add;
+		return $this;
+	}
+
+
+
+
+	public function sendSingle($singleMail=true) {
+		$this->mail['sendSingle'] = (bool)$singleMail;
+		if((bool)$singleMail) {
+			$this->mail['sendBulk'] = false;
+		}
+		return $this;
+	}
+	public function single($singleMail=true) {
+		return $this->sendSingle($singleMail);
+	}
+
+
+	public function sendBulk($bulkMail=true) {
+		$this->mail['sendBulk'] = (bool)$bulkMail;
+		if((bool)$bulkMail) {
+			$this->mail['sendSingle'] = false;
+		}
+		return $this;
+	}
+	public function bulk($bulkMail=true) {
+		return $this->sendBulk($bulkMail);
+	}
+
+
+
+
+	public function ___send($debugServer=false) {
+
+		$this->smtp->setSender($this->mail['from'], $this->mail['fromName']);
+		if($this->mail['dispositionNotification']) $this->setNotification();  // must be called after setSender
+		$this->smtp->setCustomHeader($this->mail['header']);
+		if($this->mail['priority']!='') $this->setPriority($this->mail['priority']);
+        $this->setSubject($this->mail['subject']);
+
+		if($this->bodyHTML) {
+			// we use MultipartAlternative
+			$text = strlen($this->body) ? $this->body : strip_tags($this->bodyHTML);
+			$this->setTextAndHtmlBody($text, $this->bodyHTML, (bool)$this->mail['addSignature']);
+		} else {
+			// we use plaintext
+			$this->setTextBody($this->body, (bool)$this->mail['addSignature']);
+		}
+
+
+		foreach($this->mail['attachments'] as $attachment) {
+			$this->attachFile($attachment);
+		}
+
+
+		// check and optionally adjust setting for sendSingle
+		if($this->mail['sendSingle'] && count($this->to)>1) {
+			$this->mail['sendSingle'] = false;
+			$this->logError("You have set sendSingle to true, but also you have provided more than one TO-Recipient. We now change the sending method to send multiple messages!");
+		}
+
+		// send a single email an quit
+		if($this->mail['sendSingle']) {
+
+			// with sending only a single mail, we may also use cc and bcc recipients
+			// there should be only one TO recipients, but it is let to the user how he
+			// want handle this
+			foreach($this->to as $email) {
+				$name = $this->toName[$email];
+				$this->addRecipient($email, $name, 'to');
+			}
+			foreach($this->cc as $email) {
+				$name = $this->ccName[$email];
+				$this->addRecipient($email, $name, 'cc');
+			}
+			foreach($this->bcc as $email) {
+				$this->addRecipient($email, '', 'bcc');
+			}
+
+			$maildata = '';
+			$ret = $this->smtp->send($debugServer, $debugServer, $maildata);
+			$this->maildata['send'] = $maildata;
+			return $ret ? 1 : 0;
+
+		}
+
+		// send multiple messages and quit
+		$numSent = 0;
+		$recipientsSuccess = array();
+		$recipientsFailed = array();
+		$this->smtp->SetBulkMail(1);
+		if(count($this->to)>25) $this->mail['sendBulk'] = true;
+		if($this->mail['sendBulk']) $this->smtp->SetHeader('Precedence', 'bulk');
+		foreach($this->bcc as $bcc) $this->addRecipient($bcc, '', 'bcc');
+		foreach($this->to as $to) {
+			if(in_array($to, $recipientsSuccess)) continue;  // "Only one cross each" (Monty Python: The Life of Brian)
+			set_time_limit(intval(30));
+
+			$toName = $this->mail['toName'][$to];
+			$this->addRecipient($to, $toName, 'to');
+
+			$ret = $this->smtp->send($debugServer, $debugServer, $maildata);
+
+			if($ret) {
+				$recipientsSuccess[$to] = $to;
+			}
+			else {
+				$recipientsFailed[$to] = $to;
+			}
+			$numSent += $ret ? 1 : 0;
+		}
+		$this->smtp->SetBulkMail(0);
+
+		$this->maildata['send'] = $maildata;
+		$this->maildata['recipientsSuccess'] = $recipientsSuccess;
+		$this->maildata['recipientsFailed'] = $recipientsFailed;
+
+		return $numSent;
+	}
+
+
+
+
+
+	public function getResult() {
+		// Returns an array with all settings and content of the current email
+		return $this->maildata;
+	}
+
+	public function getErrors() {
+		// Returns an array of error messages, if they occurred.
+		// Returns blank array if no errors occurred.
+		// The module would call this after getImages() or testConnection() to
+		// see if it should display/log any error messages.
+        return (array)$this->smtp->getErrors();
+	}
+
+	public function testConnection() {
+		// Tests that the email settings work. This would be used by the module at
+		// config time to give the user a Yes or No as to whether their email settings
+		// are functional. Returns a boolean TRUE or FALSE.
+        return $this->smtp->testConnection();
+	}
+
+
+
+
+			/* $type = ['To'|'CC'|'BCC'] */
+			protected function addRecipient($emailaddress, $name='', $type='To') {
+				if(!in_array(strtoupper($type), array('TO','CC','BCC'))) {
+					$type = 'To';
+				}
+				$emailaddress = str_replace(array('<', '>'), '', $emailaddress);
+				$this->maildata['recipients'][] = array('emailaddress'=>$emailaddress, 'name'=>$name, 'type'=>$type);
+				return $this->smtp->setEmailHeader($type, $emailaddress, $name);
+			}
+
+			protected function setSubject($text) {
+				$this->maildata['subject'] = (string)$text;
+				return $this->smtp->setHeader('Subject', (string)$text);
+			}
+
+			protected function setTextBody($text, $addSignature=true, $wrapText=true) {
+				$maildata = '';
+				$res = $this->smtp->setTextBody($text, $addSignature, $wrapText, $maildata);
+				$this->maildata['addSignature'] = $addSignature ? '1' : '0';
+				$this->maildata['textbody'] = $maildata;
+				return $res;
+			}
+
+			protected function setTextAndHtmlBody($text, $html, $addSignature=true, $wrapText=true) {
+				$maildata1 = $maildata2 = '';
+				$res = $this->smtp->setTextAndHtmlBody($text, $html, $addSignature, $wrapText, $maildata1, $maildata2);
+				$this->maildata['addSignature'] = $addSignature ? '1' : '0';
+				$this->maildata['textbody'] = $maildata1;
+				$this->maildata['htmlbody'] = $maildata2;
+				return $res;
+			}
+
+			protected function attachFile($filename) {
+				if(!file_exists($filename) || !is_readable($filename)) {
+					$this->logError('Error in $WireMailSmtp->attachFile($filename): Not existing or not readable file: ' . $filename);
+					return false;
+				}
+				$attachment = array(
+					"FileName"=>$filename,
+					"Content-Type"=>"automatic/name",
+					"Disposition"=>"attachment"
+				);
+				$ret = $this->smtp->addAttachment($attachment);
+				if(!$ret) {
+					return false;
+				}
+				$this->maildata['attachments'][] = $filename;
+				return true;
+			}
+
+			protected function setNotification() {
+				$maildata = '';
+				$ret = $this->smtp->setNotification($maildata);
+				if($ret) {
+					$this->maildata['notification'] = $maildata;
+				}
+				return $ret;
+			}
+
+			/* $priority = [ 1 | 2 | (3) | 4 | 5 ] */
+			protected function setPriority($priority=3) {
+				if($ret = (bool)$this->smtp->setPriority($priority)) {
+					$this->maildata['priority'] = $priority;
+				}
+				return $ret;
+			}
+
+
+
+
+	/**
+	 * Return instance of the installer class
+	 *
+	 */
+	protected function getInstaller() {
+		#require_once(dirname(__FILE__) . '/WireMailSmtpInstall.php');
+		#return new WireMailSmtpInstall();
+	}
+
+
+	/**
+	 * Perform installation
+	 *
+	 */
+	public function ___install() {
+		#$this->getInstaller()->install(self::$defaultSettings);
+	}
+
+
+	/**
+	 * Perform uninstall
+	 *
+	 */
+	public function ___uninstall() {
+		#$this->getInstaller()->uninstall($this);
+	}
+
+}
+
+
