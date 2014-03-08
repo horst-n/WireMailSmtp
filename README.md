@@ -69,6 +69,8 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 
 ###Changelog###
 
++    0.0.7 added new sentLog methods for permanent logging, intended for usage with third party modules, e.g. newsletter modules
+
 +    0.0.6 corrected addSignature to check and respect the config screen setting
      
 +    0.0.5 added multiple emails sending and bulkmail sending
