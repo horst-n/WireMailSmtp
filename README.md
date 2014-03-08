@@ -66,6 +66,15 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 **logError** ($logmessage) *- you may log errors, too. - Errors are also logged automaticaly*
 
 
+**useSentLog** (true | false) *- intended for usage with e.g. third party newsletter modules - tells the send() method to make usage of the sentLog-methods*
+
+**sentLogReset** ()  *- starts a new Session. Best usage would be interactively once when setting up a new Newsletter*
+
+**sentLogGet** ()  *- returns an array containing all previously used emailaddresses*
+
+**sentLogAdd** ($emailaddress)  *- is called automaticly within the send() method*
+
+
 
 ###Changelog###
 
