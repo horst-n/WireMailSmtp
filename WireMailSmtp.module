@@ -22,10 +22,9 @@
 
 /*******************************************************************************
   *  $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtp.module,v $
-  *  $Id: WireMailSmtp.module,v 1.11 2014/03/07 18:57:31 horst Exp $
+  *  $Id: WireMailSmtp.module,v 1.12 2014/03/08 20:31:07 horst Exp $
   ******************************************************************************
 **/
-
 
 class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 
@@ -33,9 +32,9 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			'title'     => 'Wire Mail SMTP',
-			'version'   => '0.0.6',
+			'version'   => '0.0.7',
 			'summary'   => "extends WireMail, uses SMTP Protocol, provides: TO, CC, BCC, Attachments, Priority, DispositionNotification, protocols PLAIN - SSL - START_TLS, Bulksending, ... \nIn a future version personalized message sending will be supported too.",
-			'href'      => '', //'http://mods.pw/???',
+			'href'      => 'http://processwire.com/talk/topic/5704-module-wiremailsmtp/',
 			'author'    => 'horst',
 			'singular'  => false,
 			'autoload'  => false
@@ -48,7 +47,8 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 	 *
 	 */
 	const LOG_FILENAME_ACTIVITY = 'wiremailsmtp_activity';
-	const LOG_FILENAME_ERROR = 'wiremailsmtp_errors';
+	const LOG_FILENAME_ERROR    = 'wiremailsmtp_errors';
+	const LOG_FILENAME_SENTLOG  = 'wiremailsmtp_sentlog';
 
 
 	private $smtp = null;
@@ -76,7 +76,8 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		'attachments' => array(),
 		'header' => array(),
 		'sendSingle' => false,
-		'sendBulk' => false
+		'sendBulk' => false,
+		'useSentLog' => false
 		);
 
 
@@ -111,6 +112,100 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 			'extra_headers'            => '',     // optional Custom-Meta-Headers
 			'valid_recipients'         => ''      // email addresses of valid recipients. String that we convert to array at runtime.
 			);
+	}
+
+
+
+
+
+	/**
+	 * This method is intended for usage with e.g. Newsletter-Modules.
+	 * You can hook into it if you want use alternative stores for it
+	 *
+	 * This resets the Log for sent emaildresses. It starts a new Session.
+	 * Best usage should be interactively when setting up a new Newsletter.
+	 *
+	 *
+	 * @return boolean true if Log is empty or false if it is not empty
+	 *
+	*/
+	public function ___sentLogReset() {
+		$filename = wire('config')->paths->logs . self::LOG_FILENAME_SENTLOG . '.txt';
+		@touch($filename);
+		$res = file_put_contents($filename, '', LOCK_EX );
+		if(false===$res || 0!==$res || !file_exists($filename) || !is_readable($filename) || !is_writeable($filename)) {
+			$this->logError('Cannot reset Content of the SentLog: ' . $filename);
+			throw new WireException('You want to make usage of the SentLog-feature, but cannot reset Content of the SentLog: ' . basename($filename));
+		}
+		return 0===$res ? true : false;
+	}
+
+
+	/**
+	 * This method is intended for usage with e.g. Newsletter-Modules.
+	 * You can hook into it if you want use alternative stores for it
+	 *
+	 * This returns an array containing all emailaddresses
+	 *
+	 *
+	 * @return array with emailaddresses as values
+	 *
+	*/
+	public function ___sentLogGet() {
+		$filename = wire('config')->paths->logs . self::LOG_FILENAME_SENTLOG . '.txt';
+		@touch($filename);
+		if(!file_exists($filename) || !is_readable($filename) || !is_writeable($filename)) {
+			$this->logError('Cannot get content of the SentLog: ' . $filename);
+			throw new WireException('You want to make usage of the SentLog-feature, but cannot get content of the SentLog: ' . basename($filename));
+		}
+		$a = explode("\n", trim(file_get_contents($filename)));
+		$emailaddresses = array();
+		foreach($a as $e) {
+			if(trim($e)=='') continue;
+			$emailaddresses[] = trim($e);
+		}
+		return $emailaddresses;
+	}
+
+
+	/**
+	 * This method is intended for usage with e.g. Newsletter-Modules.
+	 * You can hook into it if you want use alternative stores for it
+	 *
+	 * Add a emailaddress to the SentLog
+	 * If you have enabled the usage it is called automatically within
+	 * the send() loop to store each successful sent emailaddress.
+	 *
+	 *
+	 * @param string Must be a single email address
+	 * @return boolean true or false
+	 *
+	*/
+	public function ___sentLogAdd($emailaddress) {
+		$filename = wire('config')->paths->logs . self::LOG_FILENAME_SENTLOG . '.txt';
+		$data = trim(str_replace(array('<','>'), '', $emailaddress)) . "\n";
+		$res = file_put_contents($filename, $data, LOCK_EX + FILE_APPEND );
+        if(false===$res || strlen($data)!=$res) {
+			$this->logError('Cannot add emailaddress to the SentLog: ' . $filename);
+			throw new WireException('You want to make usage of the SentLog-feature, but cannot add emailaddress to the SentLog: ' . basename($filename));
+        }
+		return strlen($data) === $res ? true : false;
+	}
+
+
+	/**
+	 * This method is intended for usage with e.g. Newsletter-Modules.
+	 *
+	 * If the send() method should make usage of the SentLog set it to true!
+	 *
+	 *
+	 * @param boolean true or false
+	 * @return $this
+	 *
+	*/
+	public function useSentLog($useIt=true) {
+		$this->mail['useSentLog'] = (bool)$useIt;
+		return $this;
 	}
 
 
@@ -555,6 +650,16 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		$numSent = 0;
 		$recipientsSuccess = array();
 		$recipientsFailed = array();
+
+        if($this->mail['useSentLog']) {
+			$sent = $this->sentLogGet();
+			if(!is_array($sent)) {
+				$this->logError('Cannot get content of the SentLog!');
+				throw new WireException('You want to make usage of the SentLog-feature, but cannot get content of the SentLog!');
+			}
+			$recipientsSuccess = $sent;
+			unset($sent);
+		}
 		if(count($this->to)>50) $this->mail['sendBulk'] = true;
 		if(count($this->to)>5 || $this->mail['sendBulk']) $this->smtp->SetBulkMail(1);
 		if($this->mail['sendBulk']) $this->smtp->SetHeader('Precedence', 'bulk');
@@ -570,6 +675,10 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 
 			if($ret) {
 				$recipientsSuccess[$to] = $to;
+				if($this->mail['useSentLog'] && ! $this->sentLogAdd($to)) {
+					$this->logError('Cannot add emailaddress to the SentLog: ' . SELF::LOG_FILENAME_SENTLOG . '.txt');
+					throw new WireException('You want to make usage of the SentLog-feature, but cannot add emailaddress to the SentLog: ' . SELF::LOG_FILENAME_SENTLOG . '.txt');
+				}
 			}
 			else {
 				$recipientsFailed[$to] = $to;
@@ -579,6 +688,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		if(count($this->to)>5 || $this->mail['sendBulk']) $this->smtp->SetBulkMail(0);
 		$this->smtp->close();
 
+		if(!isset($maildata) && 0==$numSent) $maildata = 'no messages are sent';
 		$this->maildata['send'] = $maildata;
 		$this->maildata['recipientsSuccess'] = $recipientsSuccess;
 		$this->maildata['recipientsFailed'] = $recipientsFailed;
