@@ -17,6 +17,7 @@
 **/
 
 
+
 class WireMailSmtpConfig extends Wire {
 
 	public function getConfig(array $data) {
