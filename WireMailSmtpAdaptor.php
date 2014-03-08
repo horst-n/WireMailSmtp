@@ -5,7 +5,7 @@
   * ---------------------------------------------------------------------------
   *  @version     -   '0.0.6'
   *  @date        -   $Date: 2014/03/07 18:57:32 $
-  *  @author      -   Horst Nogajski <coding AT nogajski DOT de>
+  *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
   * ---------------------------------------------------------------------------
   *  $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtpAdaptor.php,v $
@@ -45,18 +45,18 @@ class hnsmtp {
 	private $smtp_debug                    = 0;                     /* Output debug information                     */
 	private $smtp_html_debug               = 0;                     /* Debug information is in HTML                 */
 
-    private $sender_name                   = '';                    // From: the senders name
-    private $sender_email                  = '';                    // From: the senders email address
-    private $sender_reply                  = '';                    // Reply-To: optional email address
-    private $sender_errors_to              = '';                    // Errors-To: optional email address
-    private $sender_signature              = '';                    // a Signature Text, like Contact Data and / or Confidentiality Notices
+	private $sender_name                   = '';                    // From: the senders name
+	private $sender_email                  = '';                    // From: the senders email address
+	private $sender_reply                  = '';                    // Reply-To: optional email address
+	private $sender_errors_to              = '';                    // Errors-To: optional email address
+	private $sender_signature              = '';                    // a Signature Text, like Contact Data and / or Confidentiality Notices
 	private $send_sender_signature         = 1;                     // when the signature should be send: with every mail | only when the default Email is the sender | only when explicitly called via the API
 
-    private $extra_headers                 = array();               // optional Custom-Meta-Headers
+	private $extra_headers                 = array();               // optional Custom-Meta-Headers
 	private $valid_recipients              = array();               /* SenderEmailAddresses wich are allowed to
 																	   receive Messages                             */
 	private $aValidVars                    = null;
-    private $emailMessage                  = null;
+	private $emailMessage                  = null;
 	private $connected                     = null;
 	private $errors                        = array();
 
@@ -73,7 +73,7 @@ class hnsmtp {
 
 	public function connect() {
 		$this->connected = (($this->errors[] = $this->emailMessage->StartSendingMessage()) == '') ? true : false;
-        return $this->connected;
+		return $this->connected;
 	}
 
 	public function close() {
