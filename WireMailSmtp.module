@@ -400,19 +400,14 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 	 */
 	public function from($email='', $name = null) {
 		if(is_null($name)) list($email, $name) = $this->extractEmailAndName($email);
-        if(empty($email)) {
+        	if(empty($email)) {
 			$email = $this->sender_email;
 			$name = $this->sender_name;
-        }
+        	}
 		if($name) $this->mail['fromName'] = $this->sanitizeHeader($name);
 		$this->mail['from'] = $email;
 		return $this;
 	}
-
-
-
-
-
 
 
 
@@ -466,11 +461,13 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 	}
 
 
+
+
+
 	public function addSignature($add=true) {
 		$this->mail['addSignature'] = (bool)$add;
 		return $this;
 	}
-
 
 
 
