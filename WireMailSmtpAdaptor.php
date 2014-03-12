@@ -3,7 +3,7 @@
   *  WireMailSmtp
   *
   * ---------------------------------------------------------------------------
-  *  @version     -   '0.0.6'
+  *  @version     -   '0.1.7'
   *  @date        -   $Date: 2014/03/07 18:57:32 $
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
