@@ -3,13 +3,13 @@
   *  WireMailSmtp
   *
   * ---------------------------------------------------------------------------
-  *  @version     -   '0.1.7'
-  *  @date        -   $Date: 2014/03/07 18:57:32 $
+  *  @version     -   '0.1.8'
+  *  @date        -   $Date: 2014/03/14 20:09:23 $
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
   * ---------------------------------------------------------------------------
   *  $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtpConfig.php,v $
-  *  $Id: WireMailSmtpConfig.php,v 1.6 2014/03/07 18:57:32 horst Exp $
+  *  $Id: WireMailSmtpConfig.php,v 1.7 2014/03/14 20:09:23 horst Exp $
   ******************************************************************************
   *
   *  LAST CHANGES:
@@ -206,7 +206,15 @@ class WireMailSmtpConfig extends Wire {
 			$field->attr('value', $data['sender_signature']);
 			$field->label = __('Sender Signature');
 			$field->description = __('like Contact Data and / or Confidentiality Notices');
-			$field->columnWidth = 60;
+			$field->columnWidth = 36;
+			$fieldset->add($field);
+
+			$field = $modules->get("InputfieldTextarea");
+			$field->attr('name', 'sender_signature_html');
+			$field->attr('value', $data['sender_signature_html']);
+			$field->label = __('Sender HTML-Signature');
+			$field->description = __('like Contact Data and / or Confidentiality Notices');
+			$field->columnWidth = 36;
 			$fieldset->add($field);
 
 			$field = $modules->get("InputfieldSelect");
@@ -219,7 +227,7 @@ class WireMailSmtpConfig extends Wire {
 	            		'3' => 'automaticaly with _every_ Message'
 	        	));
 			$field->description = __('when the Signature should be send by default, - (could be overriden by the API)');
-			$field->columnWidth = 40;
+			$field->columnWidth = 28;
 			$fieldset->add($field);
 
 		$form->add($fieldset);
