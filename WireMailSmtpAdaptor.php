@@ -3,13 +3,13 @@
   *  WireMailSmtp
   *
   * ---------------------------------------------------------------------------
-  *  @version     -   '0.1.7'
+  *  @version     -   '0.1.8'
   *  @date        -   $Date: 2014/03/07 18:57:32 $
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
   * ---------------------------------------------------------------------------
   *  $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtpAdaptor.php,v $
-  *  $Id: WireMailSmtpAdaptor.php,v 1.8 2014/03/07 18:57:32 horst Exp $
+  *  $Id: WireMailSmtpAdaptor.php,v 1.10 2014/03/14 20:09:23 horst Exp $
   ******************************************************************************
   *
   *  LAST CHANGES:
@@ -50,6 +50,7 @@ class hnsmtp {
 	private $sender_reply                  = '';                    // Reply-To: optional email address
 	private $sender_errors_to              = '';                    // Errors-To: optional email address
 	private $sender_signature              = '';                    // a Signature Text, like Contact Data and / or Confidentiality Notices
+	private $sender_signature_html         = '';                    // a Signature Text in HTML, like Contact Data and / or Confidentiality Notices
 	private $send_sender_signature         = 1;                     // when the signature should be send: with every mail | only when the default Email is the sender | only when explicitly called via the API
 
 	private $extra_headers                 = array();               // optional Custom-Meta-Headers
@@ -150,7 +151,7 @@ class hnsmtp {
 				if( in_array($k, array('smtp_host', 'smtp_user', 'smtp_password',
 				                       'localhost', 'workstation', 'realm',
 				                       'sender_name', 'sender_email', 'sender_reply',
-				                       'sender_errors_to', 'sender_signature',
+				                       'sender_errors_to', 'sender_signature', 'sender_signature_html',
 				                       'default_charset'
 				                       ))
 				) {
@@ -276,7 +277,9 @@ class hnsmtp {
 	public function setTextAndHtmlBody($text, $html, $addSignature, $wrapText=true, &$maildata1, &$maildata2) {
 		if($addSignature===true && isset($this->sender_signature) && is_string($this->sender_signature) && strlen(trim($this->sender_signature))>0) {
 			$text .= "\r\n\r\n--\r\n" . $this->sender_signature;
-			$html = str_replace("</body>", "\r\n\r\n<pre>" . $this->sender_signature . "</pre>\r\n</body>", $html);
+		}
+		if($addSignature===true && isset($this->sender_signature_html) && is_string($this->sender_signature_html) && strlen(trim($this->sender_signature_html))>0) {
+			$html = str_replace("</body>", "\r\n\r\n" . $this->sender_signature_html . "\r\n</body>", $html);
 		}
 		$maildata1 = $text = $wrapText ? $this->emailMessage->WrapText($text) : (string)$text;
 		$maildata2 = $html = $wrapText ? $this->emailMessage->WrapText($html) : (string)$html;
