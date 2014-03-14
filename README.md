@@ -13,7 +13,7 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 ---
 
 
-###Current Version 0.1.7  (beta)###
+###Current Version 0.1.8  (beta)###
 
 
 ###List of all options and features###
@@ -77,6 +77,10 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 
 
 ###Changelog###
+
++    0.1.8 added a separate inputfield for a HTML signature into config page
+
++    0.1.7 set status from alpha to beta
 
 +    0.0.7 added new sentLog methods for permanent logging, intended for usage with third party modules, e.g. newsletter modules
 
