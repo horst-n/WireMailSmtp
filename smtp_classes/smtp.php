@@ -1262,7 +1262,7 @@ class smtp_class
 				}
 			}
 			if($success
-			&& strlen($this->user)
+			#&& strlen($this->user)  // this disables connections without authentication, see: https://processwire.com/talk/topic/5704-module-wiremailsmtp/page-2#entry75745
 			&& strlen($this->pop3_auth_host)==0)
 			{
 				if(!IsSet($this->esmtp_extensions["AUTH"]))
