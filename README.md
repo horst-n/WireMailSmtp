@@ -13,7 +13,7 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 ---
 
 
-###Current Version 0.1.8  (beta)###
+###Current Version 0.1.9  (beta)###
 
 
 ###List of all options and features###
@@ -77,6 +77,8 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 
 
 ###Changelog###
+
++    0.1.9 disabling connecting without authentication in the smtp base class
 
 +    0.1.8 added a separate inputfield for a HTML signature into config page
 
