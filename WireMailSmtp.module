@@ -77,7 +77,8 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		'header' => array(),
 		'sendSingle' => false,
 		'sendBulk' => false,
-		'useSentLog' => false
+		'useSentLog' => false,
+		'wrapText' => true
 		);
 
 
@@ -564,6 +565,11 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		$this->mail['addSignature'] = (bool)$add;
 		return $this;
 	}
+	
+	public function wrapText($wrap=true) {
+		$this->mail['wrapText'] = (bool)$wrap;
+		return $this;
+	}
 
 
 
@@ -739,7 +745,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 				return $this->smtp->setHeader('Subject', (string)$text);
 			}
 
-			protected function setTextBody($text, $addSignature=null, $wrapText=true) {
+			protected function setTextBody($text, $addSignature=null) {
 				$maildata = '';
                 		if(!is_bool($addSignature)) {
                 			if(in_array($this->send_sender_signature, array('1','2','3'))) {
@@ -761,13 +767,13 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 						$addSignature = false;
 					}
 				}
-				$res = $this->smtp->setTextBody($text, $addSignature, $wrapText, $maildata);
+				$res = $this->smtp->setTextBody($text, $addSignature, $this->wrapText, $maildata);
 				$this->maildata['addSignature'] = $addSignature ? '1' : '0';
 				$this->maildata['textbody'] = $maildata;
 				return $res;
 			}
 
-			protected function setTextAndHtmlBody($text, $html, $addSignature=null, $wrapText=true) {
+			protected function setTextAndHtmlBody($text, $html, $addSignature=null) {
 				$maildata1 = $maildata2 = '';
                 		if(!is_bool($addSignature)) {
                 			if(in_array($this->send_sender_signature, array('1','2','3'))) {
@@ -789,7 +795,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 						$addSignature = false;
 					}
 				}
-				$res = $this->smtp->setTextAndHtmlBody($text, $html, $addSignature, $wrapText, $maildata1, $maildata2);
+				$res = $this->smtp->setTextAndHtmlBody($text, $html, $addSignature, $this->wrapText, $maildata1, $maildata2);
 				$this->maildata['addSignature'] = $addSignature ? '1' : '0';
 				$this->maildata['textbody'] = $maildata1;
 				$this->maildata['htmlbody'] = $maildata2;
