@@ -13,7 +13,7 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 ---
 
 
-###Current Version 0.1.10  (beta)###
+###Current Version 0.1.11  (beta)###
 
 
 ###List of all options and features###
