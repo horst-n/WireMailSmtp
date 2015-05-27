@@ -2,7 +2,7 @@
 /*
  * smtp.php
  *
- * @(#) $Header: /home/mlemos/cvsroot/smtp/smtp.php,v 1.45 2011/02/03 08:11:30 mlemos Exp $
+ * @(#) $Header: /opt2/ena/metal/smtp/smtp.php,v 1.48 2014/11/23 22:45:30 mlemos Exp $
  *
  */
 
@@ -12,7 +12,7 @@
 
 	<package>net.manuellemos.smtp</package>
 
-	<version>@(#) $Id: smtp.php,v 1.45 2011/02/03 08:11:30 mlemos Exp $</version>
+	<version>@(#) $Id: smtp.php,v 1.48 2014/11/23 22:45:30 mlemos Exp $</version>
 	<copyright>Copyright (C) Manuel Lemos 1999-2011</copyright>
 	<title>Sending e-mail messages via SMTP protocol</title>
 	<author>Manuel Lemos</author>
@@ -261,7 +261,7 @@ class smtp_class
 	<variable>
 		<name>user_agent</name>
 		<type>STRING</type>
-		<value>SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.45 $)</value>
+		<value>SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.48 $)</value>
 		<documentation>
 			<purpose>Set the user agent used when connecting via an HTTP proxy.</purpose>
 			<usage>Change this value only if for some reason you want emulate a
@@ -270,7 +270,7 @@ class smtp_class
 	</variable>
 {/metadocument}
 */
-	var $user_agent='SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.45 $)';
+	var $user_agent='SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.48 $)';
 
 /*
 {metadocument}
@@ -779,8 +779,12 @@ class smtp_class
 			if(strlen($this->error = $this->Resolve($this->socks_host_name, $ip, 'SOCKS')))
 				return($this->error);
 			if($this->ssl)
-				$ip="ssl://".$ip;
-			if(($this->connection=($this->timeout ? @fsockopen($ip, $this->socks_host_port, $errno, $error, $this->timeout) : @fsockopen($ip, $this->socks_host_port, $errno))))
+				$ip="ssl://".($socks_host = $this->socks_host_name);
+			else
+				$socks_host = $ip;
+			if($this->debug)
+				$this->OutputDebug("Connecting to SOCKS server \"".$socks_host."\" port ".$this->http_proxy_host_port."...");
+			if(($this->connection=($this->timeout ? fsockopen($ip, $this->socks_host_port, $errno, $error, $this->timeout) : fsockopen($ip, $this->socks_host_port, $errno, $error))))
 			{
 				$timeout=($this->data_timeout ? $this->data_timeout : $this->timeout);
 				if($timeout
@@ -885,9 +889,13 @@ class smtp_class
 		{
 			if(strlen($error = $this->Resolve($this->http_proxy_host_name, $ip, 'SMTP')))
 				return($error);
+			if($this->ssl)
+				$ip = 'ssl://'.($proxy_host = $this->http_proxy_host_name);
+			else
+				$proxy_host = $ip;
 			if($this->debug)
-				$this->OutputDebug("Connecting to proxy host address \"".$ip."\" port ".$this->http_proxy_host_port."...");
-			if(($this->connection=($this->timeout ? @fsockopen(($this->ssl ? "ssl://" : "").$ip, $this->http_proxy_host_port, $errno, $error,$this->timeout) : @fsockopen(($this->ssl ? "ssl://" : "").$ip, $this->http_proxy_host_port))))
+				$this->OutputDebug("Connecting to HTTP proxy server \"".$ip."\" port ".$this->http_proxy_host_port."...");
+			if(($this->connection=($this->timeout ? @fsockopen($ip, $this->http_proxy_host_port, $errno, $error, $this->timeout) : @fsockopen($ip, $this->http_proxy_host_port, $errno, $error))))
 			{
 				if($this->debug)
 					$this->OutputDebug('Connected to HTTP proxy host "'.$this->http_proxy_host_name.'".');
@@ -930,9 +938,15 @@ class smtp_class
 		}
 		else
 		{
+			if($this->ssl)
+				$ip = 'ssl://'.($host = $domain);
+			elseif($this->start_tls)
+				$ip = $host = $domain;
+			else
+				$host = $ip;
 			if($this->debug)
-				$this->OutputDebug("Connecting to host address \"".$ip."\" port ".$port."...");
-			if(($this->connection=($this->timeout ? @fsockopen(($this->ssl ? "ssl://" : "").$ip, $port, $errno, $error, $this->timeout) : @fsockopen(($this->ssl ? "ssl://" : "").$ip, $port))))
+				$this->OutputDebug("Connecting to SMTP server \"".$host."\" port ".$port."...");
+			if(($this->connection=($this->timeout ? @fsockopen($ip, $port, $errno, $error, $this->timeout) : @fsockopen($ip, $port, $errno, $error))))
 				return("");
 		}
 		$error=($this->timeout ? strval($error) : "??");
@@ -1251,12 +1265,12 @@ class smtp_class
 				elseif($success = ($this->PutLine('STARTTLS')
 				&& $this->VerifyResultLines('220',$responses)>0))
 				{
-					if($this->debug) $this->OutputDebug('Starting TLS cryptograpic protocol');
+					$this->OutputDebug('Starting TLS cryptograpic protocol');
 					if(!($success = stream_socket_enable_crypto($this->connection, 1, STREAM_CRYPTO_METHOD_TLS_CLIENT)))
 						$this->error = 'could not start TLS connection encryption protocol';
 					else
 					{
-						if($this->debug) $this->OutputDebug('TLS started');
+						$this->OutputDebug('TLS started');
 						$success = $this->StartSMTP($localhost);
 					}
 				}
