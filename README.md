@@ -79,6 +79,8 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 
 ###Changelog###
 
++    0.1.11 changed smtp class to new version to solve problems with mixed usage of IP and hostname, found by k07n (https://processwire.com/talk/topic/5704-wiremailsmtp/page-3#entry95880)
+    
 +    0.1.10 made wrapText configurable by Jan Romero (https://github.com/horst-n/WireMailSmtp/commit/abc0ac0b4a3edd0fcbbb8b4695f00a362705ad5b)
     
 +    0.1.9  disabling connecting without authentication in the smtp base class
