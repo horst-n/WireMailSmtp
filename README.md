@@ -13,7 +13,7 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 ---
 
 
-###Current Version 0.1.11  (beta)###
+###Current Version 0.1.12  (beta)###
 
 
 ###List of all options and features###
@@ -79,10 +79,12 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 
 ###Changelog###
 
++    0.1.12 fixed not sending to all CC-recipients when in sendSingle mode. (https://github.com/horst-n/WireMailSmtp/issues/3)
+
 +    0.1.11 changed smtp class to new version to solve problems with mixed usage of IP and hostname, found by k07n (https://processwire.com/talk/topic/5704-wiremailsmtp/page-3#entry95880)
-    
+
 +    0.1.10 made wrapText configurable by Jan Romero (https://github.com/horst-n/WireMailSmtp/commit/abc0ac0b4a3edd0fcbbb8b4695f00a362705ad5b)
-    
+
 +    0.1.9  disabling connecting without authentication in the smtp base class
 
 +    0.1.8  added a separate inputfield for a HTML signature into config page
@@ -92,15 +94,15 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 +    0.0.7  added new sentLog methods for permanent logging, intended for usage with third party modules, e.g. newsletter modules
 
 +    0.0.6  corrected addSignature to check and respect the config screen setting
-     
+
 +    0.0.5  added multiple emails sending and bulkmail sending
-     
+
 +    0.0.4  changed the functions "to" "cc" "bcc" to be compatible with Ryans changes
-     
+
 +    0.0.3  added GMT Timezone to the Dateheader to reflect local timezones and show DateTime correct in Mailclients
-     
+
 +    0.0.2  added sanitization to recipient names in email addresses (in file: WireMailSmtp.module)
-     
+
 +    0.0.1  initial release
 
 

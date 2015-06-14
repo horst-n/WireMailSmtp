@@ -32,7 +32,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			'title'     => 'Wire Mail SMTP',
-			'version'   => '0.1.11',
+			'version'   => '0.1.12',
 			'summary'   => "extends WireMail, uses SMTP protocol (plain | ssl | tls), provides: to, cc, bcc, attachments, priority, disposition notification, bulksending, ...",
 			'href'      => 'http://processwire.com/talk/topic/5704-module-wiremailsmtp/',
 			'author'    => 'horst',
@@ -565,7 +565,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		$this->mail['addSignature'] = (bool)$add;
 		return $this;
 	}
-	
+
 	public function wrapText($wrap=true) {
 		$this->mail['wrapText'] = (bool)$wrap;
 		return $this;
@@ -646,12 +646,42 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 				$this->addRecipient($email, '', 'bcc');
 			}
 
+            // correct the recipient headers >>>
+            $tmpTO = $tmpCC = $tmpBCC = array();
+            foreach($this->maildata['recipients'] as $tmpRecipient) {
+                $tmpRecipientStr = strlen(trim($tmpRecipient['name'])) > 0 ? '"'. trim($tmpRecipient['name']) .'" ' : '';
+                $tmpRecipientStr .= '<'. trim($tmpRecipient['emailaddress']) .'>';
+                switch($tmpRecipient['type']) {
+                    case 'to':
+                        $tmpTO[$tmpRecipient['emailaddress']] =  $tmpRecipientStr;
+                        break;
+                    case 'cc':
+                        $tmpCC[$tmpRecipient['emailaddress']] =  $tmpRecipientStr;
+                        break;
+                    case 'bcc':
+                        $tmpBCC[$tmpRecipient['emailaddress']] =  $tmpRecipientStr;
+                        break;
+                }
+            }
+            $tmpTOstr = implode(', ', $tmpTO);
+            $tmpCCstr = implode(', ', $tmpCC);
+            $tmpBCCstr = implode(', ', $tmpBCC);
+            #$this->smtp->setHeader('To', trim($tmpTOstr));
+            if ($tmpCCstr) {
+                $this->smtp->setHeader('CC', trim($tmpCCstr));
+            }
+            if ($tmpBCCstr) {
+                $this->smtp->setHeader('BCC', trim($tmpBCCstr));
+            }
+            unset($tmpRecipient, $tmpRecipientStr, $tmpTO, $tmpTOstr, $tmpCC, $tmpCCstr, $tmpBCC, $tmpBCCstr);
+            // <<< correct the recipient headers
+
 			$maildata = '';
 			$ret = $this->smtp->send($debugServer, $debugServer, $maildata);
 			$this->maildata['send'] = $maildata;
 			return $ret ? 1 : 0;
 
-		}
+        }
 
 		// send multiple messages and quit
 		$numSent = 0;

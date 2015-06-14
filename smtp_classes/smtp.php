@@ -558,6 +558,9 @@ class smtp_class
 	var $esmtp_host="";
 	var $maximum_piped_recipients=100;
 
+    var $doOutputDebug = false;  // horst: added to suppress "OutputDebug($message)"
+
+
 	/* Private methods - DO NOT CALL */
 
 	Function Tokenize($string,$separator="")
@@ -586,6 +589,7 @@ class smtp_class
 
 	Function OutputDebug($message)
 	{
+        if (!$this->doOutputDebug) return; // horst: added to suppress "OutputDebug($message)"
 		$message.="\n";
 		if($this->html_debug)
 			$message=str_replace("\n","<br />\n",HtmlEntities($message));
