@@ -13,7 +13,7 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 ---
 
 
-###Current Version 0.1.12  (beta)###
+###Current Version 0.1.13  (beta)###
 
 
 ###List of all options and features###
@@ -78,6 +78,8 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 
 
 ###Changelog###
+
++    0.1.13 changed default setting for wrapText from true to false.
 
 +    0.1.12 fixed not sending to all CC-recipients when in sendSingle mode. (https://github.com/horst-n/WireMailSmtp/issues/3)
 
