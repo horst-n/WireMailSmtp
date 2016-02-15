@@ -78,7 +78,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		'sendSingle' => false,
 		'sendBulk' => false,
 		'useSentLog' => false,
-		'wrapText' => true
+		'wrapText' => false
 		);
 
 
