@@ -141,6 +141,9 @@ class smtp_message_class extends email_message_class
 
 	/* Public variables */
 
+	/* Allow Self Signed Certificate */
+	var $smtp_certificate = 0;       // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
+	
 /*
 {metadocument}
 	<variable>
@@ -656,6 +659,7 @@ class smtp_message_class extends email_message_class
 		$this->smtp->authentication_mechanism=$this->smtp_authentication_mechanism;
 		$this->smtp->password=$this->smtp_password;
 		$this->smtp->esmtp=$this->esmtp;
+		$this->smtp->smtp_certificate = $this->smtp_certificate;  // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
 		if($this->smtp->Connect())
 		{
 			$this->delivery = 0;

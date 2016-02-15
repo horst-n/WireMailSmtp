@@ -2,7 +2,7 @@
 /*
  * smtp.php
  *
- * @(#) $Header: /opt2/ena/metal/smtp/smtp.php,v 1.48 2014/11/23 22:45:30 mlemos Exp $
+ * @(#) $Header: /opt2/ena/metal/smtp/smtp.php,v 1.50 2016/01/19 00:16:06 mlemos Exp $
  *
  */
 
@@ -12,7 +12,7 @@
 
 	<package>net.manuellemos.smtp</package>
 
-	<version>@(#) $Id: smtp.php,v 1.48 2014/11/23 22:45:30 mlemos Exp $</version>
+	<version>@(#) $Id: smtp.php,v 1.50 2016/01/19 00:16:06 mlemos Exp $</version>
 	<copyright>Copyright (C) Manuel Lemos 1999-2011</copyright>
 	<title>Sending e-mail messages via SMTP protocol</title>
 	<author>Manuel Lemos</author>
@@ -122,7 +122,7 @@ class smtp_class
 {/metadocument}
 */
 	var $workstation="";
-
+	
 /*
 {metadocument}
 	<variable>
@@ -261,7 +261,7 @@ class smtp_class
 	<variable>
 		<name>user_agent</name>
 		<type>STRING</type>
-		<value>SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.48 $)</value>
+		<value>SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.50 $)</value>
 		<documentation>
 			<purpose>Set the user agent used when connecting via an HTTP proxy.</purpose>
 			<usage>Change this value only if for some reason you want emulate a
@@ -270,7 +270,7 @@ class smtp_class
 	</variable>
 {/metadocument}
 */
-	var $user_agent='SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.48 $)';
+	var $user_agent='SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.50 $)';
 
 /*
 {metadocument}
@@ -545,6 +545,27 @@ class smtp_class
 */
 	var $pop3_auth_port=110;
 
+	
+	/* Allow self signed certificate */
+	var $smtp_certificate = false;   // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
+	
+	// @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
+	Function AllowSelfSignedCertificate($allow = false)
+	{
+		$version=explode(".",function_exists("phpversion") ? phpversion() : "3.0.7");
+		$php_version=intval($version[0])*1000000+intval($version[1])*1000+intval($version[2]);
+		if($php_version<5006000) return;
+		if($allow) {
+			stream_context_set_option($this->connection, 'ssl', 'verify_peer', false);
+			stream_context_set_option($this->connection, 'ssl', 'allow_self_signed', true);
+		}
+		else
+		{
+			stream_context_set_option($this->connection, 'ssl', 'verify_peer', true);
+			stream_context_set_option($this->connection, 'ssl', 'allow_self_signed', false);
+		}
+	}
+
 	/* private variables - DO NOT ACCESS */
 
 	var $state="Disconnected";
@@ -557,9 +578,6 @@ class smtp_class
 	var $disconnected_error=0;
 	var $esmtp_host="";
 	var $maximum_piped_recipients=100;
-
-    var $doOutputDebug = false;  // horst: added to suppress "OutputDebug($message)"
-
 
 	/* Private methods - DO NOT CALL */
 
@@ -589,7 +607,6 @@ class smtp_class
 
 	Function OutputDebug($message)
 	{
-        if (!$this->doOutputDebug) return; // horst: added to suppress "OutputDebug($message)"
 		$message.="\n";
 		if($this->html_debug)
 			$message=str_replace("\n","<br />\n",HtmlEntities($message));
@@ -1069,7 +1086,7 @@ class smtp_class
 		}
 		return(1);
 	}
-
+	
 	Function StartSMTP($localhost)
 	{
 		$success = 1;
@@ -1269,12 +1286,18 @@ class smtp_class
 				elseif($success = ($this->PutLine('STARTTLS')
 				&& $this->VerifyResultLines('220',$responses)>0))
 				{
-					$this->OutputDebug('Starting TLS cryptograpic protocol');
-					if(!($success = stream_socket_enable_crypto($this->connection, 1, STREAM_CRYPTO_METHOD_TLS_CLIENT)))
+					if($this->debug)
+						$this->OutputDebug('Starting TLS cryptograpic protocol');
+					
+					// @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
+					$this->AllowSelfSignedCertificate($this->smtp_certificate);
+					
+					if(!($success = @stream_socket_enable_crypto($this->connection, 1, STREAM_CRYPTO_METHOD_TLS_CLIENT)))
 						$this->error = 'could not start TLS connection encryption protocol';
 					else
 					{
-						$this->OutputDebug('TLS started');
+						if($this->debug)
+							$this->OutputDebug('TLS started');
 						$success = $this->StartSMTP($localhost);
 					}
 				}

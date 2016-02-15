@@ -32,7 +32,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			'title'     => 'Wire Mail SMTP',
-			'version'   => '0.1.13',
+			'version'   => '0.2.0',
 			'summary'   => "extends WireMail, uses SMTP protocol (plain | ssl | tls), provides: to, cc, bcc, attachments, priority, disposition notification, bulksending, ...",
 			'href'      => 'http://processwire.com/talk/topic/5704-module-wiremailsmtp/',
 			'author'    => 'horst',
@@ -78,7 +78,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		'sendSingle' => false,
 		'sendBulk' => false,
 		'useSentLog' => false,
-		'wrapText' => false
+		'wrapText' => true
 		);
 
 
@@ -112,7 +112,8 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 			'sender_signature_html'    => '',     // a Signature Text in HTML, like Contact Data and / or Confidentiality Notices
 			'send_sender_signature'    => '1',    // when the signature should be send: with every mail | only when the default Email is the sender | only when explicitly called via the API
 			'extra_headers'            => '',     // optional Custom-Meta-Headers
-			'valid_recipients'         => ''      // email addresses of valid recipients. String that we convert to array at runtime.
+			'valid_recipients'         => '',     // email addresses of valid recipients. String that we convert to array at runtime.
+			'smtp_certificate'		   => 0		  // allow or not self signed certificate (PHP >= 5.6)
 			);
 	}
 
@@ -677,7 +678,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
             // <<< correct the recipient headers
 
 			$maildata = '';
-			$ret = $this->smtp->send($debugServer, $debugServer, $maildata);
+            $ret = $this->smtp->send($debugServer, $debugServer, $maildata);
 			$this->maildata['send'] = $maildata;
 			return $ret ? 1 : 0;
 

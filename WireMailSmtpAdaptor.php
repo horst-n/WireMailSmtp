@@ -56,6 +56,9 @@ class hnsmtp {
 	private $extra_headers                 = array();               // optional Custom-Meta-Headers
 	private $valid_recipients              = array();               /* SenderEmailAddresses wich are allowed to
 																	   receive Messages                             */
+
+	private $smtp_certificate              = false;                 // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
+	
 	private $aValidVars                    = null;
 	private $emailMessage                  = null;
 	private $connected                     = null;
@@ -66,13 +69,13 @@ class hnsmtp {
 	private $fromName                      = '';
 
 
-	public function testConnection() {
-		$res = $this->connect();
+	public function testConnection($debug = false) {
+		$res = $this->connect($debug);
 		$this->close();
 		return $res;
 	}
 
-	public function connect() {
+	public function connect($debug = false) {
 		$this->connected = (($this->errors[] = $this->emailMessage->StartSendingMessage()) == '') ? true : false;
 		return $this->connected;
 	}
@@ -112,6 +115,7 @@ class hnsmtp {
 				$this->$k = intval($v);
 				break;
 
+			case 'smtp_certificate':
 			case 'smtp_ssl':
 			case 'smtp_start_tls':
 			case 'smtp_debug':
@@ -344,13 +348,13 @@ class hnsmtp {
 
 
 	public function send($debugServer=false, $htmlDebug=false, &$maildata) {
+        if($debugServer) $this->emailMessage->smtp_debug = 1;
+        if($htmlDebug) $this->emailMessage->smtp_html_debug = 1;
 		if(!$this->connect()) {
 			$this->logError('Error in '.__CLASS__.'::'.__FUNCTION__.' : cannot connect to smtp-server!');
 			return false;
 		}
 		$this->emailMessage->SetHeader("Date", gmdate("D, j M Y H:i:s \G\M\T P"));
-		if($debugServer) $this->emailMessage->smtp_debug = 1;
-		if($htmlDebug) $this->emailMessage->smtp_html_debug = 1;
 		$ret = $this->emailMessage->Send();
 		if($ret=='') {
 			$maildata = 'success';

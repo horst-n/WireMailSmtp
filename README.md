@@ -13,7 +13,7 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 ---
 
 
-###Current Version 0.1.13  (beta)###
+###Current Version 0.2.0###
 
 
 ###List of all options and features###
@@ -74,16 +74,20 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 
 **sentLogAdd** ($emailaddress)  *- is called automaticly within the send() method*
 
-**wrapText** (true|false) *- default is false*
+**wrapText** (true|false) *- default is true*
 
 
 ###Changelog###
 
++    0.2.0  added support for Selfsigned Certificates, a contribution from @flydev, (https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290) - Many thanks!
+
++    0.1.14 changed smtp class to new version 1.50 to solve a bug with two debug messages echoed out, even if debug was set to false
+
 +    0.1.13 changed default setting for wrapText from true to false.
 
-+    0.1.12 fixed not sending to all CC-recipients when in sendSingle mode. (https://github.com/horst-n/WireMailSmtp/issues/3)
++    0.1.12 fixed not sending to all CC-recipients when in sendSingle mode. ([url=https://github.com/horst-n/WireMailSmtp/issues/3]https://github.com/horst-n/WireMailSmtp/issues/3[/url])
 
-+    0.1.11 changed smtp class to new version to solve problems with mixed usage of IP and hostname, found by k07n (https://processwire.com/talk/topic/5704-wiremailsmtp/page-3#entry95880)
++    0.1.11 changed smtp class to new version to solve problems with mixed usage of IP and hostname, found by @k07n (https://processwire.com/talk/topic/5704-wiremailsmtp/page-3#entry95880)
 
 +    0.1.10 made wrapText configurable by Jan Romero (https://github.com/horst-n/WireMailSmtp/commit/abc0ac0b4a3edd0fcbbb8b4695f00a362705ad5b)
 

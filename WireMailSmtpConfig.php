@@ -115,6 +115,16 @@ class WireMailSmtpConfig extends Wire {
 			$field->columnWidth = 50;
 			$fieldset->add($field);
 
+			// @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
+			if(version_compare(phpversion(), '5.6.0', '>=')) {
+				$field = $modules->get('InputfieldCheckbox');
+				$field->attr('name', 'smtp_certificate');
+				$field->label = __('PHP >= 5.6 - Allow self signed certificate');
+				$field->attr('value', $data['smtp_certificate']);
+				$field->attr('checked', $data['smtp_certificate'] ? 'checked' : '');
+				$fieldset->add($field);
+			}
+
 //	        $field = $modules->get("InputfieldCheckbox");
 //	        $field->name = "clear_smtp_password";
 //	        $field->label = __("Clear password?");
@@ -301,7 +311,6 @@ class WireMailSmtpConfig extends Wire {
 		if($success) {
 			$note = $this->_('SUCCESS! SMTP settings appear to work correctly.');
 			$this->message($note);
-
 		} else {
 			$note = $this->_('ERROR: SMTP settings did not work.');
 			$this->error($note);
