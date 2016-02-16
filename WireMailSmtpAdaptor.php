@@ -2,19 +2,11 @@
 /*******************************************************************************
   *  WireMailSmtp
   *
-  * ---------------------------------------------------------------------------
-  *  @version     -   '0.1.8'
-  *  @date        -   $Date: 2014/03/07 18:57:32 $
+  *  @version     -   '0.1.9'
+  *  @date        -   $Date: 2016/02/15 $
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
-  * ---------------------------------------------------------------------------
-  *  $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtpAdaptor.php,v $
-  *  $Id: WireMailSmtpAdaptor.php,v 1.10 2014/03/14 20:09:23 horst Exp $
-  ******************************************************************************
-  *
-  *  LAST CHANGES:
-  *
-**/
+********************************************************************************/
 
 
 require_once( dirname(__FILE__) . '/smtp_classes/email_message.php' );
@@ -191,6 +183,7 @@ class hnsmtp {
 		$this->emailMessage->smtp_start_tls            = $this->smtp_start_tls;
 		$this->emailMessage->smtp_user                 = $this->smtp_user;
 		$this->emailMessage->smtp_password             = $this->smtp_password;
+		$this->emailMessage->smtp_certificate          = $this->smtp_certificate;
 
 		// advanced SMTP Server Settings
 		$this->emailMessage->realm                     = $this->realm;
