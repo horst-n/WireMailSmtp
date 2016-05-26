@@ -347,7 +347,7 @@ class hnsmtp {
 			$this->logError('Error in '.__CLASS__.'::'.__FUNCTION__.' : cannot connect to smtp-server!');
 			return false;
 		}
-		$this->emailMessage->SetHeader("Date", gmdate("D, j M Y H:i:s \G\M\T P"));
+		$this->emailMessage->SetHeader("Date", gmdate("D, j M Y H:i:s \G\M\T"));
 		$ret = $this->emailMessage->Send();
 		if($ret=='') {
 			$maildata = 'success';
