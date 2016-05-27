@@ -13,7 +13,7 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 ---
 
 
-###Current Version 0.2.0###
+###Current Version 0.2.2###
 
 
 ###List of all options and features###
@@ -78,6 +78,8 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 
 
 ###Changelog###
+
++    0.2.2  fixed date string to follow strict RFC2822, (https://github.com/horst-n/WireMailSmtp/issues/5) - Many thanks to @selsermedia!
 
 +    0.2.0  added support for Selfsigned Certificates, a contribution from @flydev, (https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290) - Many thanks!
 
