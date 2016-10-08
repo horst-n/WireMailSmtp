@@ -7,26 +7,35 @@
  * from M. Lemos (http://www.phpclasses.org/browse/author/1.html) into ProcessWire.
  *
  *
- * @copyright Copyright (c) 2014 - 2016, Horst Nogajski
+ * @copyright Copyright (c) 2014, Horst Nogajski
  * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License, version 2
- * OR
- * @license https://processwire.com/about/license/mit/
  *
- * ProcessWire 2.x & 3.x, Copyright 2016 by Ryan Cramer
- * https://processwire.com
- * https://processwire.com/about/license/mit/
+ * ProcessWire 2.x
+ * Copyright (C) 2013 by Ryan Cramer
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ *
+ * http://www.processwire.com
  *
 **/
+
+
+
+/*******************************************************************************
+  *  $Source: /WEB/pw4/htdocs/site/modules/WireMailSmtp/WireMailSmtp.module,v $
+  *  $Id: WireMailSmtp.module,v 1.13 2014/03/14 20:09:23 horst Exp $
+  ******************************************************************************
+**/
+
 class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 
 
 	public static function getModuleInfo() {
 		return array(
 			'title'     => 'Wire Mail SMTP',
-			'version'   => '0.2.2',
+			'version'   => '0.2.1',
 			'summary'   => "extends WireMail, uses SMTP protocol (plain | ssl | tls), provides: to, cc, bcc, attachments, priority, disposition notification, bulksending, ...",
 			'href'      => 'http://processwire.com/talk/topic/5704-module-wiremailsmtp/',
-			'author'    => 'Horst Nogajski',
+			'author'    => 'horst',
 			'singular'  => false,
 			'autoload'  => false
 			);
@@ -532,29 +541,21 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 
 
 	/**
-	 * Add attachment to the email,
-     * (conform with the core Wiremail update introduced in PW 3.0.36)
+	 * Add attachments to the email
 	 *
-     * @param $value                string, Full path and filename of file attachment, (no URL!)
-     * @param $filename (optional)  string, Optional different basename for file as it appears in the mail
-	 * @return WireMailSmtp
+	 * @param array|string filename  the filename(s) of the attachment(s), no URL(s)!
+	 * @return this
 	 *
 	 */
-    public function attachment($value, $filename = '') {
-        $a = array($filename => $value);
-        return $this->attachments($a);
-    }
-    /**
-    * @param mixed $values, array with values as Full path and filenames of file attachments
-    *                       optionally array keys as different basenames for files as they appear in the email
-    * @return WireMailSmtp
-    */
-	public function attachments($values) {
-		if(!is_array($values)) $values = explode(',', $values);
-		foreach($values as $value => $filename) {
-			$this->mail['attachments'][trim($filename)] = trim($value);
+	public function attachments($filenames) {
+		if(!is_array($filenames)) $filenames = explode(',', $filenames);
+		foreach($filenames as $filename) {
+			$this->mail['attachments'][] = trim($filename);
 		}
 		return $this;
+	}
+	public function attachment($filename) {
+		return $this->attachments($filename);
 	}
 
 
@@ -617,8 +618,8 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 		}
 
 
-		foreach($this->mail['attachments'] as $filename => $value) {
-			$this->attachFile($value, $filename);
+		foreach($this->mail['attachments'] as $attachment) {
+			$this->attachFile($attachment);
 		}
 
 
@@ -832,22 +833,21 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 				return $res;
 			}
 
-			protected function attachFile($value, $filename = '') {
-				if(!file_exists($value) || !is_readable($value)) {
-					$this->logError('Error in $WireMailSmtp->attachFile($value): Not existing or not readable file: ' . $value);
+			protected function attachFile($filename) {
+				if(!file_exists($filename) || !is_readable($filename)) {
+					$this->logError('Error in $WireMailSmtp->attachFile($filename): Not existing or not readable file: ' . $filename);
 					return false;
 				}
 				$attachment = array(
-					"FileName" => $value,
-					"Content-Type" => "automatic/name",
-					"Disposition" => "attachment"
+					"FileName"=>$filename,
+					"Content-Type"=>"automatic/name",
+					"Disposition"=>"attachment"
 				);
-                if($filename) $attachment['Name'] = $filename;
 				$ret = $this->smtp->addAttachment($attachment);
 				if(!$ret) {
 					return false;
 				}
-				$this->maildata['attachments'][] = $attachment;
+				$this->maildata['attachments'][] = $filename;
 				return true;
 			}
 

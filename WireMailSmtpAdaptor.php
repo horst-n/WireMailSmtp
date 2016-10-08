@@ -2,8 +2,8 @@
 /*******************************************************************************
   *  WireMailSmtp
   *
-  *  @version     -   '0.1.10'
-  *  @date        -   $Date: 2016/10/08 $
+  *  @version     -   '0.1.9'
+  *  @date        -   $Date: 2016/02/15 $
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
 ********************************************************************************/
@@ -50,7 +50,7 @@ class hnsmtp {
 																	   receive Messages                             */
 
 	private $smtp_certificate              = false;                 // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
-
+	
 	private $aValidVars                    = null;
 	private $emailMessage                  = null;
 	private $connected                     = null;
