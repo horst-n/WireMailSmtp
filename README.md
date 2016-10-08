@@ -13,7 +13,7 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 ---
 
 
-###Current Version 0.2.2###
+###Current Version 0.2.3###
 
 
 ###List of all options and features###
@@ -52,7 +52,7 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 
 **addSignature** ( true | false ) *- the default-behave is selectable in config screen, this can be overridden here. (only available if a signature is defined in the config screen)*
 
-**attachment** ($filename) *- add attachment file(s) - string or array()*
+**attachment** ($filename, $alternativeBasename = '') *- add attachment file*
 
 
 **send** () *- send the mail(s) and return number of successful send messages*
