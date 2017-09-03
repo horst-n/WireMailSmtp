@@ -23,7 +23,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
     public static function getModuleInfo() {
         return array(
             'title'     => 'Wire Mail SMTP',
-            'version'   => '0.2.3',
+            'version'   => '0.2.4',
             'summary'   => "extends WireMail, uses SMTP protocol (plain | ssl | tls), provides: to, cc, bcc, attachments, priority, disposition notification, bulksending, ...",
             'href'      => 'http://processwire.com/talk/topic/5704-module-wiremailsmtp/',
             'author'    => 'horst',
@@ -533,6 +533,15 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 
 
 
+        // I don't find the param names of the core class to be intuitive or descriptive in the right way.
+        // The "$value" in real is the "filename" of the attachment, and the "$filename"
+        // in real is an "alternative BASENAME"! This may lead to confusion.
+        //
+        // But I have to use it the exact same way as in the core class, because otherwise the
+        // systems raises PHP strict notices about the different param names. :(
+        // So please, for better understanding, read on the example of the next method "attachments()".
+        //
+        // old code: public function attachment($filename, $alternativeBasename = '')
     /**
      * Add attachment to the email,
      * (conform with the core Wiremail update introduced in PW 3.0.36)
@@ -540,22 +549,24 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
      * @param $filename                        string, Full path and filename of file attachment, (no URL!)
      * @param $alternativeBasename (optional)  string, Optional different basename for file as it appears in the mail
      * @return WireMailSmtp
-     *
      */
-    public function attachment($filename, $alternativeBasename = '') {
-        $a = array($filename => $alternativeBasename);
+    public function attachment($value, $filename = '') {
+        $a = array($value => $filename);
         return $this->attachments($a);
     }
     /**
-    * @param mixed $values, array with values as Full path and filenames of file attachments
-    *                       optionally array keys as different basenames for files as they appear in the email
+    * @param array $values, array with keys (absolute pathes to filenames) and optional values (alternative basenames)
+    * example:  array(
+    *               '/an/absolute/path/to/file.typ'     => 'alternative-basename.typ',
+    *               '/another/path/to/anotherfile.typ'  => '',
+    *               // ...
+    *           )
     * @return WireMailSmtp
     */
     public function attachments($values) {
-        if(!is_array($values)) $values = explode(',', $values);
         // $value is the fullpath filename (!), filename is an optional alternativeBasename (!), the terms are this way in PW core WireMail
-        foreach($values as $value => $filename) {
-            $this->mail['attachments'][trim($value)] = trim($filename);
+        foreach($values as $filename => $alternativeBasename) {
+            $this->mail['attachments'][trim($filename)] = trim($alternativeBasename);
         }
         return $this;
     }
