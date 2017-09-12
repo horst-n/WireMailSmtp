@@ -1,5 +1,7 @@
 ###Changelog###
 
++    0.2.5  fixed adding HTML-signatures into HTML-messages without body-end-tag
+
 +    0.2.4  updated the attachment function to silence a PHP-Strict notice
 
 +    0.2.3  updated the attachment function to be conform with the new integrated function in core WireMail class (introduced with PW 3.0.36)

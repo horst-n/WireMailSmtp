@@ -23,7 +23,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
     public static function getModuleInfo() {
         return array(
             'title'     => 'Wire Mail SMTP',
-            'version'   => '0.2.4',
+            'version'   => '0.2.5',
             'summary'   => "extends WireMail, uses SMTP protocol (plain | ssl | tls), provides: to, cc, bcc, attachments, priority, disposition notification, bulksending, ...",
             'href'      => 'http://processwire.com/talk/topic/5704-module-wiremailsmtp/',
             'author'    => 'horst',
@@ -613,7 +613,6 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 
 
     public function ___send($debugServer=false) {
-
         $this->smtp->setSender($this->mail['from'], $this->mail['fromName']);
         if($this->mail['dispositionNotification']) $this->setNotification();  // must be called after setSender
         $this->smtp->setCustomHeader($this->mail['header']);
@@ -818,9 +817,9 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 
             protected function setTextAndHtmlBody($text, $html, $addSignature=null) {
                 $maildata1 = $maildata2 = '';
-                        if(!is_bool($addSignature)) {
-                            if(in_array($this->send_sender_signature, array('1','2','3'))) {
-                                switch($this->send_sender_signature) {
+                if(!is_bool($addSignature)) {
+                    if(in_array($this->send_sender_signature, array('1','2','3'))) {
+                        switch($this->send_sender_signature) {
                             case '1':   // only when explicitly called via API
                                 $addSignature = false;
                                 break;

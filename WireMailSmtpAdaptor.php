@@ -2,8 +2,8 @@
 /*******************************************************************************
   *  WireMailSmtp
   *
-  *  @version     -   '0.1.10'
-  *  @date        -   2016/10/08
+  *  @version     -   '0.1.11'
+  *  @date        -   2017/09/12
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
   *  @licence     -   MIT - https://processwire.com/about/license/mit/
@@ -277,8 +277,14 @@ class hnsmtp {
 			$text .= "\r\n\r\n--\r\n" . $this->sender_signature;
 		}
 		if($addSignature===true && isset($this->sender_signature_html) && is_string($this->sender_signature_html) && strlen(trim($this->sender_signature_html))>0) {
-			$html = str_replace("</body>", "\r\n\r\n" . $this->sender_signature_html . "\r\n</body>", $html);
+            // we first need to check if there is a </body> end tag in the html-markup
+            if(preg_match('</body>', $html)) {
+                $html = str_replace("</body>", "\r\n\r\n" . $this->sender_signature_html . "\r\n</body>", $html);
+            } else {
+                $html .= "\r\n\r\n" . $this->sender_signature_html . "\r\n";
+            }
 		}
+
 		$maildata1 = $text = $wrapText ? $this->emailMessage->WrapText($text) : (string)$text;
 		$maildata2 = $html = $wrapText ? $this->emailMessage->WrapText($html) : (string)$html;
 
