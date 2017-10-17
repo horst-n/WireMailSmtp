@@ -1,5 +1,8 @@
 ###Changelog###
 
++    0.2.6  module config cosmetics by @abdus, many thanks!
+            (https://processwire.com/talk/topic/5704-wiremailsmtp/?page=9&tab=comments#comment-153329)
+
 +    0.2.5  fixed adding HTML-signatures into HTML-messages without body-end-tag
 
 +    0.2.4  updated the attachment function to silence a PHP-Strict notice
