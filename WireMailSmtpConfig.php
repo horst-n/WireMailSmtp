@@ -109,6 +109,7 @@ class WireMailSmtpConfig extends Wire
         // SMTP PASSWORD
         $smtpWrapper->add([
             'type'        => 'text',
+            'name'        => 'smtp_password',
             'value'       => $data['smtp_password'],
             'label'       => $this->_('SMTP Password'),
             'description' => $this->_('Set this variable to the user password when the SMTP server requires authentication.'),
