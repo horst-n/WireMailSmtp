@@ -1,5 +1,7 @@
 ###Changelog###
 
++    0.2.7  @abdus fixed smtp password not saving
+
 +    0.2.6  module config cosmetics by @abdus, many thanks!
             (https://processwire.com/talk/topic/5704-wiremailsmtp/?page=9&tab=comments#comment-153329)
 
