@@ -1,5 +1,7 @@
 ###Changelog###
 
++    0.3.0  fixed code that broke backward compatibility for PW 2.4 and 2.5, brought in with the config cosmetics (0.2.6)
+
 +    0.2.7  @abdus fixed smtp password not saving
 
 +    0.2.6  module config cosmetics by @abdus, many thanks!
