@@ -1,22 +1,22 @@
 WireMailSmtp
 ============
 
-###ProcessWire: a extension to the new WireMail base class that uses SMTP-transport###
+### ProcessWire: a extension to the new WireMail base class that uses SMTP-transport ###
 
-###only functional with ProcessWire Version 2.4.1 or greater###
+### Only functional with ProcessWire Version 2.4.1 or greater ###
 
 This module integrates EmailMessage, SMTP and SASL php-libraries from [Manuel Lemos](http://www.phpclasses.org/browse/author/1.html) into ProcessWire.
 
 
-More information and code examples: http://processwire.com/talk/topic/5704-module-wiremailsmtp/
+[More information and code examples](http://processwire.com/talk/topic/5704-module-wiremailsmtp/)
 
 ---
 
 
-###Current Version 0.3.0###
+### Current Version 0.3.0 ###
 
 
-###List of all options and features###
+### List of all options and features ###
 
 **testConnection** () *- returns true on success, false on failures*
 
@@ -78,4 +78,4 @@ More information and code examples: http://processwire.com/talk/topic/5704-modul
 
 
 
-More information and code examples: http://processwire.com/talk/topic/5704-module-wiremailsmtp/
+[More information and code examples](http://processwire.com/talk/topic/5704-module-wiremailsmtp/)
