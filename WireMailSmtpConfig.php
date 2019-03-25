@@ -2,7 +2,7 @@
 /*******************************************************************************
   *  WireMailSmtp
   * ---------------------------------------------------------------------------
-  *  @version     -   '0.3.0'
+  *  @version     -   '0.3.1'
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
 *******************************************************************************/
@@ -45,7 +45,7 @@ class WireMailSmtpConfig extends Wire {
             $field->label = $this->_('SMTP Hostname');
             $field->description = $this->_('Set to the host name of the SMTP server to which you want to relay the messages');
             $field->columnWidth = 50;
-            $field->required = true;
+            #$field->required = true;
             $field->icon = 'server';
             $fieldset->add($field);
 
@@ -57,7 +57,7 @@ class WireMailSmtpConfig extends Wire {
             $field->description = $this->_('Set to the TCP port of the SMTP server host to connect');
             $field->notes = $this->_("default: 25\ndefault for TLS / SSL: 587 or 465");
             $field->columnWidth = 50;
-            $field->required = true;
+            #$field->required = true;
             $field->icon = 'sign-out';
             $fieldset->add($field);
 
