@@ -78,7 +78,7 @@ class WireMailSmtpConfig extends Wire {
             $field = $modules->get('InputfieldText');
             $field->attr('name', 'smtp_user');
             $field->attr('value', $data['smtp_user']);
-            $field->label = $this->_('SMTP user');
+            $field->label = $this->_('SMTP User');
             $field->description = $this->_('Set this variable to the user name when the SMTP server requires authentication');
             if(isset($siteconfig['smtp_user'])) {
                 $field->notes = $this->attentionMessage($siteconfig['smtp_user']);
@@ -92,7 +92,7 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('name', 'smtp_password');
             $field->attr('value', $data['smtp_password']);
             $field->attr('type', 'password');
-            $field->label = $this->_('SMTP password');
+            $field->label = $this->_('SMTP Password');
             $field->description = $this->_('Set this variable to the user password when the SMTP server requires authentication');
             if(isset($siteconfig['smtp_password'])) {
                 $field->notes = $this->attentionMessage('*******');
@@ -351,6 +351,18 @@ class WireMailSmtpConfig extends Wire {
 
         $form->add($fieldset);
 
+
+        // DISPLAY FINAL MERGED SETTINGS
+        $field = $modules->get('InputfieldMarkup');
+        $field->attr('name', '_final_settings');
+        $field->label = 'Final Merged Settings';
+        $field->icon = 'filter';
+        $field->columnWidth = 100;
+        $field->collapsed = Inputfield::collapsedNo;
+        $field->attr('value', $this->finalSettingsMessage($siteconfig));
+        $form->add($field);
+
+
         // TEST SETTINGS
         $field = $modules->get('InputfieldCheckbox');
         $field->attr('name', '_test_settings');
@@ -400,6 +412,71 @@ class WireMailSmtpConfig extends Wire {
 
     private function attentionMessage($value) {
         return sprintf($this->_("ATTENTION: Value is overwritten by an entry in your site/config.php:\n -[ %s ]- "), $value);
+    }
+
+
+    private function finalSettingsMessage($siteconfig) {
+
+        $outputTemplate = "<pre style=\"overflow:scroll !important; margin:15px auto; padding:10px 10px 10px 10px; background-color:#ffffdd; color:#555; border:1px solid #AAA; font-family:'Hack', 'Source Code Pro', 'Lucida Console', 'Courier', monospace; font-size:12px; line-height:15px;\">[__CONTENT__]</pre>";
+
+        if(!count($siteconfig)) {
+            $content = 'There are no overriding settings defined in your site/config.php';
+            return str_replace('[__CONTENT__]', $content, $outputTemplate);
+        }
+
+        $validKeys = array(
+            'localhost',
+            'smtp_host',
+            'smtp_port',
+            'smtp_ssl',
+            'smtp_start_tls',
+            'smtp_user',
+            'smtp_password',
+            'smtp_certificate',
+            'realm',
+            'workstation',
+            'authentication_mechanism',
+            'sender_name',
+            'sender_email',
+            'sender_reply',
+            'sender_errors_to',
+            'sender_signature',
+            'sender_signature_html',
+            'extra_headers',
+            'valid_recipients',
+            #'smtp_debug',
+            #'smtp_html_debug',
+        );
+        $module = wire('modules')->get('WireMailSmtp');
+        $dump = $module->getSettings();
+        $v = array();
+        foreach($validKeys as $k) {
+            if(isset($dump[$k])) {
+                $v[$k] = 'smtp_password' == $k ? '********' : $dump[$k];
+            }
+        }
+
+        ob_start();
+        var_dump($v);
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $m = 0;
+        preg_match_all('#^(.*)=>#mU', $content, $stack);
+        $lines = $stack[1];
+        $indents = array_map('strlen', $lines);
+        if($indents) $m = max($indents) + 1;
+        $content = preg_replace_callback(
+            '#^(.*)=>\\n\s+(\S)#Um',
+            function($match) use ($m) {
+                return $match[1] . str_repeat(' ', ($m - strlen($match[1]) > 1 ? $m - strlen($match[1]) : 1)) . $match[2];
+            },
+            $content
+        );
+        $content = preg_replace('#^((\s*).*){$#m', "\\1\n\\2{", $content);
+        $content = str_replace(array('<pre>', '</pre>'), '', $content);
+
+        return str_replace('[__CONTENT__]', $content, $outputTemplate);
     }
 
 }
