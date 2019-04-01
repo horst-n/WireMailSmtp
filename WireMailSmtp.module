@@ -6,12 +6,12 @@
  * from M. Lemos (http://www.phpclasses.org/browse/author/1.html) into ProcessWire.
  *
  *
- * @copyright Copyright (c) 2014 - 2016, Horst Nogajski
+ * @copyright Copyright (c) 2014 - 2019, Horst Nogajski
  * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License, version 2
  * OR
  * @license https://processwire.com/about/license/mit/
  *
- * ProcessWire 2.x & 3.x, Copyright 2016 by Ryan Cramer
+ * ProcessWire 2.x & 3.x, Copyright 2019 by Ryan Cramer
  * https://processwire.com
  * https://processwire.com/about/license/mit/
  *
@@ -23,7 +23,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
     public static function getModuleInfo() {
         return array(
             'title'     => 'Wire Mail SMTP',
-            'version'   => '0.3.0',
+            'version'   => '0.3.1',
             'summary'   => "Extends WireMail, uses SMTP protocol (plain | SSL | TLS), provides: to, cc, bcc, attachments, priority, disposition notification, bulksending, ...",
             'href'      => 'http://processwire.com/talk/topic/5704-module-wiremailsmtp/',
             'author'    => 'horst',
@@ -209,6 +209,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
      *
      */
     public function getSettings() {
+        $siteconfig = is_array($this->wire('config')->wiremailsmtp) ? $this->wire('config')->wiremailsmtp : array();
         $settings = array();
         foreach(self::getDefaultData() as $key => $value) {
             $k = $key;
@@ -221,6 +222,8 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
                     $emails[] = trim($email);
                 }
                 $settings[$key] = $emails;
+                // now check for settings in site/config.php that should override the default settings from the module config:
+                if(isset($siteconfig[$key])) $settings[$key] = $siteconfig[$key];
                 continue;
             }
             if($key === 'extra_headers') {
@@ -233,9 +236,13 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
                     $extraHeaders[$tmp[0]] = $tmp[1];
                 }
                 $settings[$key] = $extraHeaders;
+                // now check for settings in site/config.php that should override the default settings from the module config:
+                if(isset($siteconfig[$key])) $settings[$key] = $siteconfig[$key];
                 continue;
             }
             $settings[$k] = $this->$key;
+            // now check for settings in site/config.php that should override the default settings from the module config:
+            if(isset($siteconfig[$k])) $settings[$k] = $siteconfig[$k];
         }
         return $settings;
     }

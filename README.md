@@ -13,7 +13,8 @@ This module integrates EmailMessage, SMTP and SASL php-libraries from [Manuel Le
 ---
 
 
-### Current Version 0.3.0 ###
+### Current Version 0.3.1 ###
+
 
 
 ### List of all options and features ###

@@ -2,7 +2,7 @@
 /*******************************************************************************
   *  WireMailSmtp
   * ---------------------------------------------------------------------------
-  *  @version     -   '0.3.0'
+  *  @version     -   '0.3.1'
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
 *******************************************************************************/
@@ -18,6 +18,7 @@ class WireMailSmtpConfig extends Wire {
             $this->error(' requires ProcessWire 2.4.1 or newer. Please update.');
         }
 
+        $siteconfig = is_array(wire('config')->wiremailsmtp) ? wire('config')->wiremailsmtp : array();
         $modules = wire('modules');
         $form = new InputfieldWrapper();
 
@@ -27,7 +28,11 @@ class WireMailSmtpConfig extends Wire {
         $field->attr('value', $data['localhost']);
         $field->label = $this->_('Local Hostname');
         $field->description = $this->_('Hostname of this computer');
-        $field->required = true;
+        if(isset($siteconfig['localhost'])) {
+            $field->notes = $this->attentionMessage($siteconfig['localhost']);
+        } else {
+            $field->required = true;
+        }
         $field->icon = 'desktop';
         $form->add($field);
 
@@ -45,7 +50,11 @@ class WireMailSmtpConfig extends Wire {
             $field->label = $this->_('SMTP Hostname');
             $field->description = $this->_('Set to the host name of the SMTP server to which you want to relay the messages');
             $field->columnWidth = 50;
-            $field->required = true;
+            if(isset($siteconfig['smtp_host'])) {
+                $field->notes = $this->attentionMessage($siteconfig['smtp_host']);
+            } else {
+                $field->required = true;
+            }
             $field->icon = 'server';
             $fieldset->add($field);
 
@@ -55,9 +64,13 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('value', $data['smtp_port']);
             $field->label = $this->_('SMTP Port');
             $field->description = $this->_('Set to the TCP port of the SMTP server host to connect');
-            $field->notes = $this->_("default: 25\ndefault for TLS / SSL: 587 or 465");
+            if(isset($siteconfig['smtp_port'])) {
+                $field->notes = $this->attentionMessage($siteconfig['smtp_port']);
+            } else {
+                $field->notes = $this->_("default: 25\ndefault for TLS / SSL: 587 or 465");
+                $field->required = true;
+            }
             $field->columnWidth = 50;
-            $field->required = true;
             $field->icon = 'sign-out';
             $fieldset->add($field);
 
@@ -65,8 +78,11 @@ class WireMailSmtpConfig extends Wire {
             $field = $modules->get('InputfieldText');
             $field->attr('name', 'smtp_user');
             $field->attr('value', $data['smtp_user']);
-            $field->label = $this->_('SMTP user');
+            $field->label = $this->_('SMTP User');
             $field->description = $this->_('Set this variable to the user name when the SMTP server requires authentication');
+            if(isset($siteconfig['smtp_user'])) {
+                $field->notes = $this->attentionMessage($siteconfig['smtp_user']);
+            }
             $field->columnWidth = 50;
             $field->icon = 'user';
             $fieldset->add($field);
@@ -76,9 +92,13 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('name', 'smtp_password');
             $field->attr('value', $data['smtp_password']);
             $field->attr('type', 'password');
-            $field->label = $this->_('SMTP password');
+            $field->label = $this->_('SMTP Password');
             $field->description = $this->_('Set this variable to the user password when the SMTP server requires authentication');
-            $field->notes = $this->_('**Note**: Password is stored as plain text in database.');
+            if(isset($siteconfig['smtp_password'])) {
+                $field->notes = $this->attentionMessage('*******');
+            } else {
+                $field->notes = $this->_('**Note**: Password is stored as plain text in database.');
+            }
             $field->columnWidth = 50;
             $field->icon = 'asterisk';
             $fieldset->add($field);
@@ -91,6 +111,9 @@ class WireMailSmtpConfig extends Wire {
             $field->columnWidth = 50;
             $field->label = $this->_('Use START-TLS');
             $field->description = $this->_('Check if the connection to the SMTP server should use encryption after the connection is established using TLS protocol');
+            if(isset($siteconfig['smtp_start_tls'])) {
+                $field->notes = $this->attentionMessage($siteconfig['smtp_start_tls']);
+            }
             $field->icon = 'lock';
             $field->showOnlyIf = 'smtp_ssl=0';
             $fieldset->add($field);
@@ -103,6 +126,9 @@ class WireMailSmtpConfig extends Wire {
             $field->columnWidth = 50;
             $field->label = $this->_('Use SSL');
             $field->description = $this->_('Check if the SMTP server requires secure connections using SSL protocol');
+            if(isset($siteconfig['smtp_ssl'])) {
+                $field->notes = $this->attentionMessage($siteconfig['smtp_ssl']);
+            }
             $field->icon = 'lock';
             $field->showOnlyIf = 'smtp_start_tls=0';
             $fieldset->add($field);
@@ -133,7 +159,11 @@ class WireMailSmtpConfig extends Wire {
                 $field->attr('value', $data['authentication_mechanism']);
                 $field->label = $this->_('Authentication Mechanism');
                 $field->description = $this->_('Force the use of a specific authentication mechanism.');
-                $field->notes = $this->_('Default: empty');
+                if(isset($siteconfig['authentication_mechanism'])) {
+                    $field->notes = $this->attentionMessage($siteconfig['authentication_mechanism']);
+                } else {
+                    $field->notes = $this->_('Default: empty');
+                }
                 $field->columnWidth = 33;
                 $field->icon = 'unlock';
                 $fieldset2->add($field);
@@ -144,7 +174,11 @@ class WireMailSmtpConfig extends Wire {
                 $field->attr('value', $data['realm']);
                 $field->label = $this->_('Realm');
                 $field->description = $this->_('Set this variable when the SMTP server requires authentication and if more than one authentication realm is supported');
-                $field->notes = $this->_('Default: empty');
+                if(isset($siteconfig['realm'])) {
+                    $field->notes = $this->attentionMessage($siteconfig['realm']);
+                } else {
+                    $field->notes = $this->_('Default: empty');
+                }
                 $field->columnWidth = 34;
                 $field->icon = 'map-signs';
                 $fieldset2->add($field);
@@ -155,7 +189,11 @@ class WireMailSmtpConfig extends Wire {
                 $field->attr('value', $data['workstation']);
                 $field->label = $this->_('Workstation');
                 $field->description = $this->_('Set this variable to the client workstation when the SMTP server requires authentication identifiying the origin workstation name');
-                $field->notes = $this->_('Default: empty');
+                if(isset($siteconfig['workstation'])) {
+                    $field->notes = $this->attentionMessage($siteconfig['workstation']);
+                } else {
+                    $field->notes = $this->_('Default: empty');
+                }
                 $field->columnWidth = 33;
                 $field->icon = 'building';
                 $fieldset2->add($field);
@@ -177,6 +215,9 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('name', 'sender_email');
             $field->attr('value', $data['sender_email']);
             $field->label = $this->_('Sender Email Address');
+            if(isset($siteconfig['sender_email'])) {
+                $field->notes = $this->attentionMessage($siteconfig['sender_email']);
+            }
             $field->columnWidth = 50;
             $field->icon = 'at';
             $fieldset->add($field);
@@ -186,7 +227,9 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('name', 'sender_name');
             $field->attr('value', $data['sender_name']);
             $field->label = $this->_('Sender Name');
-            $field->description = $this->_("");
+            if(isset($siteconfig['sender_name'])) {
+                $field->notes = $this->attentionMessage($siteconfig['sender_name']);
+            }
             $field->columnWidth = 50;
             $field->icon = 'user';
             $fieldset->add($field);
@@ -197,6 +240,9 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('value', $data['sender_reply']);
             $field->label = $this->_('Reply Email Address');
             $field->description = $this->_('if is empty, Sender Emailaddress is used');
+            if(isset($siteconfig['sender_reply'])) {
+                $field->notes = $this->attentionMessage($siteconfig['sender_reply']);
+            }
             $field->columnWidth = 50;
             $field->collapsed = Inputfield::collapsedYes;
             $field->icon = 'mail-reply';
@@ -207,7 +253,11 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('name', 'sender_errors_to');
             $field->attr('value', $data['sender_errors_to']);
             $field->label = $this->_('Errors Email Address');
-            $field->notes = $this->_('Default: empty');
+            if(isset($siteconfig['sender_errors_to'])) {
+                $field->notes = $this->attentionMessage($siteconfig['sender_errors_to']);
+            } else {
+                $field->notes = $this->_('Default: empty');
+            }
             $field->columnWidth = 50;
             $field->collapsed = Inputfield::collapsedYes;
             $field->icon = 'remove';
@@ -219,6 +269,9 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('value', $data['sender_signature']);
             $field->label = $this->_('Sender Signature (Plain Text)');
             $field->description = $this->_('Like Contact Data and / or Confidentiality Notices');
+            if(isset($siteconfig['sender_signature'])) {
+                $field->notes = $this->attentionMessage('***');
+            }
             $field->columnWidth = 36;
             $field->icon = 'pencil';
             $fieldset->add($field);
@@ -229,6 +282,9 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('value', $data['sender_signature_html']);
             $field->label = $this->_('Sender Signature (HTML)');
             $field->description = $this->_('Like Contact Data and / or Confidentiality Notices');
+            if(isset($siteconfig['sender_signature_html'])) {
+                $field->notes = $this->attentionMessage('***');
+            }
             $field->columnWidth = 36;
             $field->icon = 'code';
             $fieldset->add($field);
@@ -263,7 +319,14 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('value', $data['valid_recipients']);
             $field->label = $this->_('Valid Recipients');
             $field->description = $this->_('List of email addresses that can receive messages.');
-            $field->notes = $this->_('One email per line');
+            if(isset($siteconfig['valid_recipients'])) {
+                $aTemp = array();
+                foreach($siteconfig['valid_recipients'] as $k => $v) $aTemp[] = "{$k} : {$v}";
+                $field->notes = $this->attentionMessage("\n" . implode("\n", $aTemp) . "\n");
+                unset($k, $v, $aTemp);
+            } else {
+                $field->notes = $this->_('One email per line');
+            }
             $field->columnWidth = 50;
             $field->icon = 'users';
             $fieldset->add($field);
@@ -274,12 +337,31 @@ class WireMailSmtpConfig extends Wire {
             $field->attr('value', $data['extra_headers']);
             $field->label = $this->_('Extra Headers');
             $field->description = $this->_('Optionally define custom meta headers.');
-            $field->notes = $this->_('One header per line');
+            if(isset($siteconfig['extra_headers'])) {
+                $aTemp = array();
+                foreach($siteconfig['extra_headers'] as $k => $v) $aTemp[] = "{$k} : {$v}";
+                $field->notes = $this->attentionMessage("\n" . implode("\n", $aTemp) . "\n");
+                unset($k, $v, $aTemp);
+            } else {
+                $field->notes = $this->_('One email per line');
+            }
             $field->columnWidth = 50;
             $field->icon = 'align-left';
             $fieldset->add($field);
 
         $form->add($fieldset);
+
+
+        // DISPLAY FINAL MERGED SETTINGS
+        $field = $modules->get('InputfieldMarkup');
+        $field->attr('name', '_final_settings');
+        $field->label = 'Final Merged Settings';
+        $field->icon = 'filter';
+        $field->columnWidth = 100;
+        $field->collapsed = Inputfield::collapsedNo;
+        $field->attr('value', $this->finalSettingsMessage($siteconfig));
+        $form->add($field);
+
 
         // TEST SETTINGS
         $field = $modules->get('InputfieldCheckbox');
@@ -325,6 +407,76 @@ class WireMailSmtpConfig extends Wire {
         }
 
         return $note;
+    }
+
+
+    private function attentionMessage($value) {
+        return sprintf($this->_("ATTENTION: Value is overwritten by an entry in your site/config.php:\n -[ %s ]- "), $value);
+    }
+
+
+    private function finalSettingsMessage($siteconfig) {
+
+        $outputTemplate = "<pre style=\"overflow:scroll !important; margin:15px auto; padding:10px 10px 10px 10px; background-color:#ffffdd; color:#555; border:1px solid #AAA; font-family:'Hack', 'Source Code Pro', 'Lucida Console', 'Courier', monospace; font-size:12px; line-height:15px;\">[__CONTENT__]</pre>";
+
+        if(!count($siteconfig)) {
+            $content = 'There are no overriding settings defined in your site/config.php';
+            return str_replace('[__CONTENT__]', $content, $outputTemplate);
+        }
+
+        $validKeys = array(
+            'localhost',
+            'smtp_host',
+            'smtp_port',
+            'smtp_ssl',
+            'smtp_start_tls',
+            'smtp_user',
+            'smtp_password',
+            'smtp_certificate',
+            'realm',
+            'workstation',
+            'authentication_mechanism',
+            'sender_name',
+            'sender_email',
+            'sender_reply',
+            'sender_errors_to',
+            'sender_signature',
+            'sender_signature_html',
+            'extra_headers',
+            'valid_recipients',
+            #'smtp_debug',
+            #'smtp_html_debug',
+        );
+        $module = wire('modules')->get('WireMailSmtp');
+        $dump = $module->getSettings();
+        $v = array();
+        foreach($validKeys as $k) {
+            if(isset($dump[$k])) {
+                $v[$k] = 'smtp_password' == $k ? '********' : $dump[$k];
+            }
+        }
+
+        ob_start();
+        var_dump($v);
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $m = 0;
+        preg_match_all('#^(.*)=>#mU', $content, $stack);
+        $lines = $stack[1];
+        $indents = array_map('strlen', $lines);
+        if($indents) $m = max($indents) + 1;
+        $content = preg_replace_callback(
+            '#^(.*)=>\\n\s+(\S)#Um',
+            function($match) use ($m) {
+                return $match[1] . str_repeat(' ', ($m - strlen($match[1]) > 1 ? $m - strlen($match[1]) : 1)) . $match[2];
+            },
+            $content
+        );
+        $content = preg_replace('#^((\s*).*){$#m', "\\1\n\\2{", $content);
+        $content = str_replace(array('<pre>', '</pre>'), '', $content);
+
+        return str_replace('[__CONTENT__]', $content, $outputTemplate);
     }
 
 }
