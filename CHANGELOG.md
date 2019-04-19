@@ -1,13 +1,17 @@
 # Changelog
 
 
-### 0.4.1  added support for verbose debug of the connection and sending process via a new method: $mail->debugSend()
+### 0.4.1 - 2019-04-19
+- added support for verbose debug of the connection and sending process via a new method: $mail->debugSend()
 
-### 0.4.0  added support for manual selection of a crypto method for TLS per this request: https://processwire.com/talk/topic/5704-wiremailsmtp/page/12/?tab=comments#comment-184229
+### 0.4.0 - 2019-04-19
+- added support for manual selection of a crypto method for TLS per this request: https://processwire.com/talk/topic/5704-wiremailsmtp/page/12/?tab=comments#comment-184229
 
-### 0.3.1  enhanced the module to get overridden by site/config settings per this request: https://processwire.com/talk/topic/5704-wiremailsmtp/page/12/?tab=comments#comment-182735
+### 0.3.1 - 2019-03-27
+- enhanced the module to get overridden by site/config settings per this request: https://processwire.com/talk/topic/5704-wiremailsmtp/page/12/?tab=comments#comment-182735
 
-### 0.3.0  fixed code that broke backward compatibility for PW 2.4 and 2.5, brought in with the config cosmetics (0.2.6)
+### 0.3.0 - 2017-12-08
+- fixed code that broke backward compatibility for PW 2.4 and 2.5, brought in with the config cosmetics (0.2.6)
 
 ### 0.2.7 - 2017-10-19
 - @abdus fixed smtp password not saving
