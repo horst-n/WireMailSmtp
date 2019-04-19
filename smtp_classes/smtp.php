@@ -5,7 +5,12 @@
  * @(#) $Header: /opt2/ena/metal/smtp/smtp.php,v 1.51 2016/08/23 04:55:14 mlemos Exp $
  *
  */
-
+/**
+*   @horst, 19.04.2019:
+*       added support for: smtp_tls_crypto_method
+*
+*
+*/
 /*
 {metadocument}<?xml version="1.0" encoding="ISO-8859-1"?>
 <class>
@@ -122,7 +127,7 @@ class smtp_class
 {/metadocument}
 */
 	var $workstation="";
-	
+
 /*
 {metadocument}
 	<variable>
@@ -307,6 +312,8 @@ class smtp_class
 {/metadocument}
 */
 	var $ssl=0;
+    var $smtp_ssl_crypto_method = '';  // @horst
+
 
 /*
 {metadocument}
@@ -326,6 +333,7 @@ class smtp_class
 {/metadocument}
 */
 	var $start_tls = 0;
+    var $smtp_tls_crypto_method = '';  // @horst
 
 /*
 {metadocument}
@@ -564,10 +572,10 @@ class smtp_class
 */
 	var $pop3_auth_port=110;
 
-	
+
 	/* Allow self signed certificate */
 	var $smtp_certificate = false;   // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
-	
+
 	// @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
 	Function AllowSelfSignedCertificate($allow = false)
 	{
@@ -1106,7 +1114,7 @@ class smtp_class
 		}
 		return(1);
 	}
-	
+
 	Function StartSMTP($localhost)
 	{
 		$success = 1;
@@ -1307,17 +1315,26 @@ class smtp_class
 				&& $this->VerifyResultLines('220',$responses)>0))
 				{
 					if($this->debug)
-						$this->OutputDebug('Starting TLS cryptograpic protocol');
-					
+						$this->OutputDebug('Starting TLS cryptographic protocol');
+
 					// @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
 					$this->AllowSelfSignedCertificate($this->smtp_certificate);
-					
-					if(!($success = @stream_socket_enable_crypto($this->connection, 1, STREAM_CRYPTO_METHOD_TLS_CLIENT)))
-						$this->error = 'could not start TLS connection encryption protocol';
-					else
-					{
-						if($this->debug)
-							$this->OutputDebug('TLS started');
+
+                    // @horst: support for different TLS crypto methods in differend PHP versions,
+                    // see: https://processwire.com/talk/topic/5704-wiremailsmtp/page/12/?tab=comments#comment-184229 (thanks @androbey !)
+                    // and: https://www.php.net/manual/en/function.stream-socket-enable-crypto.php#119122
+                    $validTlsCryptoMethods = WireMailSmtp::getCryptoMethodsTLS();
+                    // use the userdefined method or try to use the highest available method
+                    $tls_crypto_method = in_array($this->smtp_tls_crypto_method, $validTlsCryptoMethods) ? $this->smtp_tls_crypto_method : array_shift($validTlsCryptoMethods);
+                    if(($success = @stream_socket_enable_crypto($this->connection, 1, constant($tls_crypto_method)))) {
+                        if($this->debug) $this->OutputDebug("TLS started: {$tls_crypto_method}");
+                    } else {
+                        $this->error = "could not start TLS connection encryption protocol: {$tls_crypto_method}";
+                        if($this->debug) $this->OutputDebug("could not start TLS connection encryption protocol: {$tls_crypto_method}");
+                    }
+
+                    // Start SMTP, if TLS method is supported and working
+					if($success) {
 						$success = $this->StartSMTP($localhost);
 					}
 				}
