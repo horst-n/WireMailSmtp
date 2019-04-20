@@ -13,13 +13,15 @@ This module integrates EmailMessage, SMTP and SASL php-libraries from [Manuel Le
 ---
 
 
-### Current Version 0.3.1 ###
+### Current Version 0.4.1 ###
 
 
 
 ### List of all options and features ###
 
 **testConnection** () *- returns true on success, false on failures*
+
+**debugSend** () *- send the mail(s) and output or return verbose messages of the complete connection and sending process*
 
 
 **sendSingle** ( true | false ) *- default is false*

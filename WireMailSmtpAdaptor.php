@@ -1,9 +1,9 @@
 <?php
 /*******************************************************************************
-  *  WireMailSmtp
+  *  WireMailSmtp | hnsmtp
   *
-  *  @version     -   '0.1.11'
-  *  @date        -   2017/09/12
+  *  @version     -   '0.4.1'
+  *  @date        -   2019/04/19
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
   *  @licence     -   MIT - https://processwire.com/about/license/mit/
@@ -24,8 +24,10 @@ class hnsmtp {
 	private $smtp_host                     = '';                    /* SMTP server host name                        */
 	private $smtp_port                     = 25;                    /* SMTP server host port,
                                                                        usually 25 but for use with SSL or TLS 587   */
-	private $smtp_ssl                      = 0;                     /* Establish secure connections using SSL       */
-	private $smtp_start_tls                = 0;                     /* Establish secure connections using START_TLS */
+    private $smtp_ssl                      = 0;                     /* Establish secure connections using SSL       */
+    private $smtp_ssl_crypto_method        = '';                    /* Define the crypto method to use with SSL     */
+    private $smtp_start_tls                = 0;                     /* Establish secure connections using START_TLS */
+    private $smtp_tls_crypto_method        = '';                    /* Define the crypto method to use with TLS     */
 
 	private $localhost                     = '';                    /* this computers address                       */
 	private $realm                         = '';                    /* Authentication realm or domain               */
@@ -98,11 +100,10 @@ class hnsmtp {
 
 
 	private function set_var_val( $k, $v ) {
-		if( ! in_array( $k, $this->aValidVars ) ) {
+		if(!in_array($k, $this->aValidVars)) {
 			return;
 		}
-
-		switch( $k ) {
+		switch($k) {
 			case 'send_sender_signature':
 			case 'smtp_port':
 				$this->$k = intval($v);
@@ -113,27 +114,36 @@ class hnsmtp {
 			case 'smtp_start_tls':
 			case 'smtp_debug':
 			case 'smtp_html_debug':
-				if( is_bool($v) )
-				{
+				if(is_bool($v)) {
 					$this->$k = $v==true ? 1 : 0;
 				}
-				elseif( is_int($v) )
-				{
+				elseif(is_int($v)) {
 					$this->$k = $v==1 ? 1 : 0;
 				}
-				elseif( is_string($v) && in_array($v, array('1','on','On','ON','true','TRUE')) )
-				{
+				elseif(is_string($v) && in_array($v, array('1','on','On','ON','true','TRUE'))) {
 					$this->$k = 1;
 				}
-				elseif( is_string($v) && in_array($v, array('0','off','Off','OFF','false','FALSE')) )
-				{
+				elseif(is_string($v) && in_array($v, array('0','off','Off','OFF','false','FALSE'))) {
 					$this->$k = 0;
 				}
-				else
-				{
+				else {
 					$this->$k = 0;
 				}
 				break;
+
+            case 'smtp_tls_crypto_method':
+                $availableTLSmethods = WireMailSmtp::getCryptoMethodsTLS();
+                if(is_string($v) && isset($v, $availableTLSmethods)) {
+                    $this->$k = $v;
+                }
+                break;
+
+            case 'smtp_ssl_crypto_method':
+                $availableSSLmethods = WireMailSmtp::getCryptoMethodsSSL();
+                if(is_string($v) && isset($v, $availableSSLmethods)) {
+                    $this->$k = $v;
+                }
+                break;
 
 			case 'authentication_mechanism':
 				$this->authentication_mechanism = $v;
@@ -145,7 +155,7 @@ class hnsmtp {
 				break;
 
 			default:
-				if( in_array($k, array('smtp_host', 'smtp_user', 'smtp_password',
+				if(in_array($k, array('smtp_host', 'smtp_user', 'smtp_password',
 				                       'localhost', 'workstation', 'realm',
 				                       'sender_name', 'sender_email', 'sender_reply',
 				                       'sender_errors_to', 'sender_signature', 'sender_signature_html',
@@ -155,17 +165,18 @@ class hnsmtp {
 					$this->$k = strval($v);
 				}
 		}
+
+
 	}
 
-	public function __construct($aConfig=null) {
-
+	public function __construct($aConfig = null) {
 		if(!is_array($aConfig)) {
 			return;
 		}
 
 		$this->aValidVars = get_class_vars(__CLASS__);
-		foreach($aConfig as $k=>$v) {
-			$this->set_var_val( $k, $v );
+		foreach($aConfig as $k => $v) {
+			$this->set_var_val($k, $v);
 		}
 
 		foreach($this->valid_recipients as $k=>$v) {
@@ -181,8 +192,10 @@ class hnsmtp {
 		$this->emailMessage->smtp_host                 = $this->smtp_host;
 		$this->emailMessage->smtp_port                 = $this->smtp_port;
 		$this->emailMessage->smtp_ssl                  = $this->smtp_ssl;
+        $this->emailMessage->smtp_ssl_crypto_method    = $this->smtp_ssl_crypto_method;
 		$this->emailMessage->smtp_start_tls            = $this->smtp_start_tls;
-		$this->emailMessage->smtp_user                 = $this->smtp_user;
+        $this->emailMessage->smtp_tls_crypto_method    = $this->smtp_tls_crypto_method;
+        $this->emailMessage->smtp_user                 = $this->smtp_user;
 		$this->emailMessage->smtp_password             = $this->smtp_password;
 		$this->emailMessage->smtp_certificate          = $this->smtp_certificate;
 
@@ -194,6 +207,7 @@ class hnsmtp {
 		// Debug on / off
 		$this->emailMessage->smtp_debug                = $this->smtp_debug;
 		$this->emailMessage->smtp_html_debug           = $this->smtp_html_debug;
+
 	}
 
 	public function __destruct() {

@@ -6,7 +6,12 @@
  *
  *
  */
-
+/**
+*   @horst, 19.04.2019:
+*       added support for: smtp_tls_crypto_method
+*
+*
+*/
 /*
 {metadocument}<?xml version="1.0" encoding="ISO-8859-1"?>
 <class>
@@ -143,7 +148,13 @@ class smtp_message_class extends email_message_class
 
 	/* Allow Self Signed Certificate */
 	var $smtp_certificate = 0;       // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
-	
+
+    /* @horst: Allow to define the crypto method for TLS connections */
+    var $smtp_tls_crypto_method = '';
+
+    /* @horst: Allow to define the crypto method for SSL connections */
+    var $smtp_ssl_crypto_method = '';
+
 /*
 {metadocument}
 	<variable>
@@ -640,8 +651,10 @@ class smtp_message_class extends email_message_class
 		$this->smtp->host_name=$this->smtp_host;
 		$this->smtp->host_port=$this->smtp_port;
 		$this->smtp->ssl=$this->smtp_ssl;
+        $this->smtp->smtp_ssl_crypto_method=$this->smtp_ssl_crypto_method;
 		$this->smtp->start_tls=$this->smtp_start_tls;
-		$this->smtp->http_proxy_host_name=$this->smtp_http_proxy_host_name;
+        $this->smtp->smtp_tls_crypto_method=$this->smtp_tls_crypto_method;
+        $this->smtp->http_proxy_host_name=$this->smtp_http_proxy_host_name;
 		$this->smtp->http_proxy_host_port=$this->smtp_http_proxy_host_port;
 		$this->smtp->socks_host_name=$this->smtp_socks_host_name;
 		$this->smtp->socks_host_port=$this->smtp_socks_host_port;

@@ -2,17 +2,22 @@
 /*
  * smtp.php
  *
- * @(#) $Header: /opt2/ena/metal/smtp/smtp.php,v 1.50 2016/01/19 00:16:06 mlemos Exp $
+ * @(#) $Header: /opt2/ena/metal/smtp/smtp.php,v 1.51 2016/08/23 04:55:14 mlemos Exp $
  *
  */
-
+/**
+*   @horst, 19.04.2019:
+*       added support for: smtp_tls_crypto_method
+*
+*
+*/
 /*
 {metadocument}<?xml version="1.0" encoding="ISO-8859-1"?>
 <class>
 
 	<package>net.manuellemos.smtp</package>
 
-	<version>@(#) $Id: smtp.php,v 1.50 2016/01/19 00:16:06 mlemos Exp $</version>
+	<version>@(#) $Id: smtp.php,v 1.51 2016/08/23 04:55:14 mlemos Exp $</version>
 	<copyright>Copyright (C) Manuel Lemos 1999-2011</copyright>
 	<title>Sending e-mail messages via SMTP protocol</title>
 	<author>Manuel Lemos</author>
@@ -122,7 +127,7 @@ class smtp_class
 {/metadocument}
 */
 	var $workstation="";
-	
+
 /*
 {metadocument}
 	<variable>
@@ -142,6 +147,25 @@ class smtp_class
 {/metadocument}
 */
 	var $authentication_mechanism="";
+
+/*
+{metadocument}
+	<variable>
+		<name>sasl_autoload</name>
+		<type>BOOLEAN</type>
+		<value>0</value>
+		<documentation>
+			<purpose>Specify whether the class should check if the SASL classes
+				exists or should they be loaded with an autoloader.</purpose>
+			<usage>Set this variable to
+				<tt><booleanvalue>1</booleanvalue></tt> if you are using an
+					autoloader to load the SASL classes.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $sasl_autoload=0;
+
 
 /*
 {metadocument}
@@ -261,7 +285,7 @@ class smtp_class
 	<variable>
 		<name>user_agent</name>
 		<type>STRING</type>
-		<value>SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.50 $)</value>
+		<value>SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.51 $)</value>
 		<documentation>
 			<purpose>Set the user agent used when connecting via an HTTP proxy.</purpose>
 			<usage>Change this value only if for some reason you want emulate a
@@ -270,7 +294,7 @@ class smtp_class
 	</variable>
 {/metadocument}
 */
-	var $user_agent='SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.50 $)';
+	var $user_agent='SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.51 $)';
 
 /*
 {metadocument}
@@ -288,6 +312,8 @@ class smtp_class
 {/metadocument}
 */
 	var $ssl=0;
+    var $smtp_ssl_crypto_method = '';  // @horst
+
 
 /*
 {metadocument}
@@ -307,6 +333,7 @@ class smtp_class
 {/metadocument}
 */
 	var $start_tls = 0;
+    var $smtp_tls_crypto_method = '';  // @horst
 
 /*
 {metadocument}
@@ -545,10 +572,10 @@ class smtp_class
 */
 	var $pop3_auth_port=110;
 
-	
+
 	/* Allow self signed certificate */
 	var $smtp_certificate = false;   // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
-	
+
 	// @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
 	Function AllowSelfSignedCertificate($allow = false)
 	{
@@ -990,8 +1017,9 @@ class smtp_class
 	Function SASLAuthenticate($mechanisms, $credentials, &$authenticated, &$mechanism)
 	{
 		$authenticated=0;
-		if(!function_exists("class_exists")
-		|| !class_exists("sasl_client_class"))
+		if(!$this->sasl_autoload
+		&& (!function_exists("class_exists")
+		|| !class_exists("sasl_client_class")))
 		{
 			$this->error="it is not possible to authenticate using the specified mechanism because the SASL library class is not loaded";
 			return(0);
@@ -1086,7 +1114,7 @@ class smtp_class
 		}
 		return(1);
 	}
-	
+
 	Function StartSMTP($localhost)
 	{
 		$success = 1;
@@ -1287,23 +1315,32 @@ class smtp_class
 				&& $this->VerifyResultLines('220',$responses)>0))
 				{
 					if($this->debug)
-						$this->OutputDebug('Starting TLS cryptograpic protocol');
-					
+						$this->OutputDebug('Starting TLS cryptographic protocol');
+
 					// @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
 					$this->AllowSelfSignedCertificate($this->smtp_certificate);
-					
-					if(!($success = @stream_socket_enable_crypto($this->connection, 1, STREAM_CRYPTO_METHOD_TLS_CLIENT)))
-						$this->error = 'could not start TLS connection encryption protocol';
-					else
-					{
-						if($this->debug)
-							$this->OutputDebug('TLS started');
+
+                    // @horst: support for different TLS crypto methods in differend PHP versions,
+                    // see: https://processwire.com/talk/topic/5704-wiremailsmtp/page/12/?tab=comments#comment-184229 (thanks @androbey !)
+                    // and: https://www.php.net/manual/en/function.stream-socket-enable-crypto.php#119122
+                    $validTlsCryptoMethods = WireMailSmtp::getCryptoMethodsTLS();
+                    // use the userdefined method or try to use the highest available method
+                    $tls_crypto_method = in_array($this->smtp_tls_crypto_method, $validTlsCryptoMethods) ? $this->smtp_tls_crypto_method : array_shift($validTlsCryptoMethods);
+                    if(($success = @stream_socket_enable_crypto($this->connection, 1, constant($tls_crypto_method)))) {
+                        if($this->debug) $this->OutputDebug("TLS started: {$tls_crypto_method}");
+                    } else {
+                        $this->error = "could not start TLS connection encryption protocol: {$tls_crypto_method}";
+                        if($this->debug) $this->OutputDebug("could not start TLS connection encryption protocol: {$tls_crypto_method}");
+                    }
+
+                    // Start SMTP, if TLS method is supported and working
+					if($success) {
 						$success = $this->StartSMTP($localhost);
 					}
 				}
 			}
 			if($success
-			#&& strlen($this->user)  // this disables connections without authentication, see: https://processwire.com/talk/topic/5704-module-wiremailsmtp/page-2#entry75745
+			//&& strlen($this->user)  // this disables connections without authentication, see: https://processwire.com/talk/topic/5704-module-wiremailsmtp/page-2#entry75745
 			&& strlen($this->pop3_auth_host)==0)
 			{
 				if(!IsSet($this->esmtp_extensions["AUTH"]))
