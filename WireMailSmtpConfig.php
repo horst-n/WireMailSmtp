@@ -482,7 +482,7 @@ class WireMailSmtpConfig extends Wire {
             'smtp_host',
             'smtp_port',
             'smtp_ssl',
-            'smtp_ssl_crypto_method',
+            //'smtp_ssl_crypto_method',
             'smtp_start_tls',
             'smtp_tls_crypto_method',
             'smtp_user',
