@@ -103,8 +103,6 @@ class hnsmtp {
 		if(!in_array($k, $this->aValidVars)) {
 			return;
 		}
-$hn = new hn_basic();
-
 		switch($k) {
 			case 'send_sender_signature':
 			case 'smtp_port':
@@ -172,7 +170,6 @@ $hn = new hn_basic();
 	}
 
 	public function __construct($aConfig = null) {
-
 		if(!is_array($aConfig)) {
 			return;
 		}
