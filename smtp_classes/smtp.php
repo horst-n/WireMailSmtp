@@ -312,8 +312,6 @@ class smtp_class
 {/metadocument}
 */
 	var $ssl=0;
-    var $smtp_ssl_crypto_method = '';  // @horst
-
 
 /*
 {metadocument}
@@ -333,7 +331,6 @@ class smtp_class
 {/metadocument}
 */
 	var $start_tls = 0;
-    var $smtp_tls_crypto_method = '';  // @horst
 
 /*
 {metadocument}
@@ -572,6 +569,15 @@ class smtp_class
 */
 	var $pop3_auth_port=110;
 
+
+    /* Support for manual Selection of a TLS Crypto Method */
+    var $smtp_tls_crypto_method = '';  // @horst
+
+    /* ONLY A PLACEHOLDER */
+    var $smtp_ssl_crypto_method = '';  // @horst
+
+    /* Server allows connecting without user name and password */
+    var $allow_without_authentication = 0;  // @horst
 
 	/* Allow self signed certificate */
 	var $smtp_certificate = false;   // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
@@ -1339,7 +1345,12 @@ class smtp_class
 					}
 				}
 			}
-			if($success
+            if($success && $this->allow_without_authentication)
+            {
+                // we explicitly check if connecting without user name and password is allowed,
+                // or if the credentials are empty by accident
+            }
+			else if($success
 			//&& strlen($this->user)  // this disables connections without authentication, see: https://processwire.com/talk/topic/5704-module-wiremailsmtp/page-2#entry75745
 			&& strlen($this->pop3_auth_host)==0)
 			{
@@ -1352,68 +1363,78 @@ class smtp_class
 				}
 				else
 				{
-					if(strlen($this->authentication_mechanism))
-						$mechanisms=array($this->authentication_mechanism);
-					else
-					{
-						$mechanisms=array();
-						for($authentication=$this->Tokenize($this->esmtp_extensions["AUTH"]," ");strlen($authentication);$authentication=$this->Tokenize(" "))
-							$mechanisms[]=$authentication;
-					}
-					$credentials=array(
-						"user"=>$this->user,
-						"password"=>$this->password
-					);
-					if(strlen($this->realm))
-						$credentials["realm"]=$this->realm;
-					if(strlen($this->workstation))
-						$credentials["workstation"]=$this->workstation;
-					$success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
-					if(!$success
-					&& !strcmp($mechanism,"PLAIN"))
-					{
-						/*
-						 * Author:  Russell Robinson, 25 May 2003, http://www.tectite.com/
-						 * Purpose: Try various AUTH PLAIN authentication methods.
-						 */
-						$mechanisms=array("PLAIN");
-						$credentials=array(
-							"user"=>$this->user,
-							"password"=>$this->password
-						);
-						if(strlen($this->realm))
-						{
-							/*
-							 * According to: http://www.sendmail.org/~ca/email/authrealms.html#authpwcheck_method
-							 * some sendmails won't accept the realm, so try again without it
-							 */
-							$success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
-						}
-						if(!$success)
-						{
-							/*
-							 * It was seen an EXIM configuration like this:
-							 * user^password^unused
-							 */
-							$credentials["mode"]=SASL_PLAIN_EXIM_DOCUMENTATION_MODE;
-							$success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
-						}
-						if(!$success)
-						{
-							/*
-							 * ... though: http://exim.work.de/exim-html-3.20/doc/html/spec_36.html
-							 * specifies: ^user^password
-							 */
-							$credentials["mode"]=SASL_PLAIN_EXIM_MODE;
-							$success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
-						}
-					}
-					if($success
-					&& strlen($mechanism)==0)
-					{
-						$this->error="it is not supported any of the authentication mechanisms required by the server";
-						$success=0;
-					}
+                    // we explicitly check if connecting without user name and password is allowed,
+                    // or if the credentials are empty by accident
+                    if(!strlen($this->user) || !strlen($this->password)) {
+                        $this->error="missing SMTP user name and / or missing SMTP password";
+                        $success=0;
+                    }
+                    else
+                    {
+
+					    if(strlen($this->authentication_mechanism))
+						    $mechanisms=array($this->authentication_mechanism);
+					    else
+					    {
+						    $mechanisms=array();
+						    for($authentication=$this->Tokenize($this->esmtp_extensions["AUTH"]," ");strlen($authentication);$authentication=$this->Tokenize(" "))
+							    $mechanisms[]=$authentication;
+					    }
+					    $credentials=array(
+						    "user"=>$this->user,
+						    "password"=>$this->password
+					    );
+					    if(strlen($this->realm))
+						    $credentials["realm"]=$this->realm;
+					    if(strlen($this->workstation))
+						    $credentials["workstation"]=$this->workstation;
+					    $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
+					    if(!$success
+					    && !strcmp($mechanism,"PLAIN"))
+					    {
+						    /*
+						     * Author:  Russell Robinson, 25 May 2003, http://www.tectite.com/
+						     * Purpose: Try various AUTH PLAIN authentication methods.
+						     */
+						    $mechanisms=array("PLAIN");
+						    $credentials=array(
+							    "user"=>$this->user,
+							    "password"=>$this->password
+						    );
+						    if(strlen($this->realm))
+						    {
+							    /*
+							     * According to: http://www.sendmail.org/~ca/email/authrealms.html#authpwcheck_method
+							     * some sendmails won't accept the realm, so try again without it
+							     */
+							    $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
+						    }
+						    if(!$success)
+						    {
+							    /*
+							     * It was seen an EXIM configuration like this:
+							     * user^password^unused
+							     */
+							    $credentials["mode"]=SASL_PLAIN_EXIM_DOCUMENTATION_MODE;
+							    $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
+						    }
+						    if(!$success)
+						    {
+							    /*
+							     * ... though: http://exim.work.de/exim-html-3.20/doc/html/spec_36.html
+							     * specifies: ^user^password
+							     */
+							    $credentials["mode"]=SASL_PLAIN_EXIM_MODE;
+							    $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
+						    }
+					    }
+                        if($success
+                        && strlen($mechanism)==0)
+					    {
+						    $this->error="it is not supported any of the authentication mechanisms required by the server";
+						    $success=0;
+					    }
+                    }
 				}
 			}
 		}

@@ -149,6 +149,9 @@ class smtp_message_class extends email_message_class
 	/* Allow Self Signed Certificate */
 	var $smtp_certificate = 0;       // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
 
+    /* @horst: Allow Connections without Authentication */
+    var $allow_without_authentication = 0;
+
     /* @horst: Allow to define the crypto method for TLS connections */
     var $smtp_tls_crypto_method = '';
 
@@ -651,9 +654,9 @@ class smtp_message_class extends email_message_class
 		$this->smtp->host_name=$this->smtp_host;
 		$this->smtp->host_port=$this->smtp_port;
 		$this->smtp->ssl=$this->smtp_ssl;
-        $this->smtp->smtp_ssl_crypto_method=$this->smtp_ssl_crypto_method;
+        $this->smtp->smtp_ssl_crypto_method=$this->smtp_ssl_crypto_method;  // @horst
 		$this->smtp->start_tls=$this->smtp_start_tls;
-        $this->smtp->smtp_tls_crypto_method=$this->smtp_tls_crypto_method;
+        $this->smtp->smtp_tls_crypto_method=$this->smtp_tls_crypto_method;  // @horst
         $this->smtp->http_proxy_host_name=$this->smtp_http_proxy_host_name;
 		$this->smtp->http_proxy_host_port=$this->smtp_http_proxy_host_port;
 		$this->smtp->socks_host_name=$this->smtp_socks_host_name;
@@ -673,6 +676,7 @@ class smtp_message_class extends email_message_class
 		$this->smtp->password=$this->smtp_password;
 		$this->smtp->esmtp=$this->esmtp;
 		$this->smtp->smtp_certificate = $this->smtp_certificate;  // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
+        $this->smtp->allow_without_authentication = $this->allow_without_authentication;  // @horst
 		if($this->smtp->Connect())
 		{
 			$this->delivery = 0;

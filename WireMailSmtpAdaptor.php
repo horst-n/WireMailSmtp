@@ -2,8 +2,8 @@
 /*******************************************************************************
   *  WireMailSmtp | hnsmtp
   *
-  *  @version     -   '0.4.1'
-  *  @date        -   2019/04/19
+  *  @version     -   '0.4.2'
+  *  @date        -   2019/05/02
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
   *  @licence     -   MIT - https://processwire.com/about/license/mit/
@@ -21,24 +21,25 @@ class hnsmtp {
 
 	private $default_charset               = 'UTF-8';
 
-	private $smtp_host                     = '';                    /* SMTP server host name                        */
+	private $smtp_host                     = '';                    /* SMTP server host name                           */
 	private $smtp_port                     = 25;                    /* SMTP server host port,
-                                                                       usually 25 but for use with SSL or TLS 587   */
-    private $smtp_ssl                      = 0;                     /* Establish secure connections using SSL       */
-    private $smtp_ssl_crypto_method        = '';                    /* Define the crypto method to use with SSL     */
-    private $smtp_start_tls                = 0;                     /* Establish secure connections using START_TLS */
-    private $smtp_tls_crypto_method        = '';                    /* Define the crypto method to use with TLS     */
+                                                                       usually 25 but for use with SSL or TLS 587      */
+    private $smtp_ssl                      = 0;                     /* Establish secure connections using SSL          */
+    private $smtp_ssl_crypto_method        = '';                    /* Define the crypto method to use with SSL        */
+    private $smtp_start_tls                = 0;                     /* Establish secure connections using START_TLS    */
+    private $smtp_tls_crypto_method        = '';                    /* Define the crypto method to use with TLS        */
 
-	private $localhost                     = '';                    /* this computers address                       */
-	private $realm                         = '';                    /* Authentication realm or domain               */
-	private $workstation                   = '';                    /* Workstation for NTLM authentication          */
-	private $authentication_mechanism      = '';                    /* SASL authentication mechanism                */
+	private $localhost                     = '';                    /* this computers address                          */
+	private $realm                         = '';                    /* Authentication realm or domain                  */
+	private $workstation                   = '';                    /* Workstation for NTLM authentication             */
+	private $authentication_mechanism      = '';                    /* SASL authentication mechanism                   */
 
-	private $smtp_user                     = '';                    /* Authentication user name                     */
-	private $smtp_password                 = '';                    /* Authentication password                      */
+    private $allow_without_authentication  = 0;                     /* Server allows connection without authentication */
+	private $smtp_user                     = '';                    /* Authentication user name                        */
+	private $smtp_password                 = '';                    /* Authentication password                         */
 
-	private $smtp_debug                    = 0;                     /* Output debug information                     */
-	private $smtp_html_debug               = 0;                     /* Debug information is in HTML                 */
+	private $smtp_debug                    = 0;                     /* Output debug information                        */
+	private $smtp_html_debug               = 0;                     /* Debug information is in HTML                    */
 
 	private $sender_name                   = '';                    // From: the senders name
 	private $sender_email                  = '';                    // From: the senders email address
@@ -50,7 +51,7 @@ class hnsmtp {
 
 	private $extra_headers                 = array();               // optional Custom-Meta-Headers
 	private $valid_recipients              = array();               /* SenderEmailAddresses wich are allowed to
-																	   receive Messages                             */
+																	   receive Messages                                */
 
 	private $smtp_certificate              = false;                 // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
 
@@ -114,6 +115,7 @@ class hnsmtp {
 			case 'smtp_start_tls':
 			case 'smtp_debug':
 			case 'smtp_html_debug':
+            case 'allow_without_authentication':
 				if(is_bool($v)) {
 					$this->$k = $v==true ? 1 : 0;
 				}
@@ -165,8 +167,6 @@ class hnsmtp {
 					$this->$k = strval($v);
 				}
 		}
-
-
 	}
 
 	public function __construct($aConfig = null) {
@@ -187,26 +187,27 @@ class hnsmtp {
 		$this->emailMessage = new smtp_message_class();
 
 		// SMTP Server Authentication
-		$this->emailMessage->default_charset           = $this->default_charset;
-		$this->emailMessage->localhost                 = $this->localhost;
-		$this->emailMessage->smtp_host                 = $this->smtp_host;
-		$this->emailMessage->smtp_port                 = $this->smtp_port;
-		$this->emailMessage->smtp_ssl                  = $this->smtp_ssl;
-        $this->emailMessage->smtp_ssl_crypto_method    = $this->smtp_ssl_crypto_method;
-		$this->emailMessage->smtp_start_tls            = $this->smtp_start_tls;
-        $this->emailMessage->smtp_tls_crypto_method    = $this->smtp_tls_crypto_method;
-        $this->emailMessage->smtp_user                 = $this->smtp_user;
-		$this->emailMessage->smtp_password             = $this->smtp_password;
-		$this->emailMessage->smtp_certificate          = $this->smtp_certificate;
+		$this->emailMessage->default_charset              = $this->default_charset;
+		$this->emailMessage->localhost                    = $this->localhost;
+		$this->emailMessage->smtp_host                    = $this->smtp_host;
+		$this->emailMessage->smtp_port                    = $this->smtp_port;
+		$this->emailMessage->smtp_ssl                     = $this->smtp_ssl;
+        $this->emailMessage->smtp_ssl_crypto_method       = $this->smtp_ssl_crypto_method;
+		$this->emailMessage->smtp_start_tls               = $this->smtp_start_tls;
+        $this->emailMessage->smtp_tls_crypto_method       = $this->smtp_tls_crypto_method;
+        $this->emailMessage->smtp_user                    = $this->smtp_user;
+		$this->emailMessage->smtp_password                = $this->smtp_password;
+        $this->emailMessage->allow_without_authentication = $this->allow_without_authentication;
+		$this->emailMessage->smtp_certificate             = $this->smtp_certificate;
 
 		// advanced SMTP Server Settings
-		$this->emailMessage->realm                     = $this->realm;
-		$this->emailMessage->workstation               = $this->workstation;
-		$this->emailMessage->authentication_mechanism  = $this->authentication_mechanism;
+		$this->emailMessage->realm                        = $this->realm;
+		$this->emailMessage->workstation                  = $this->workstation;
+		$this->emailMessage->authentication_mechanism     = $this->authentication_mechanism;
 
 		// Debug on / off
-		$this->emailMessage->smtp_debug                = $this->smtp_debug;
-		$this->emailMessage->smtp_html_debug           = $this->smtp_html_debug;
+		$this->emailMessage->smtp_debug                   = $this->smtp_debug;
+		$this->emailMessage->smtp_html_debug              = $this->smtp_html_debug;
 
 	}
 

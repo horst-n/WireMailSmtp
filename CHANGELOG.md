@@ -1,6 +1,9 @@
 # Changelog
 
 
+### 0.4.2 - 2019-05-02
+- added support for connections without authentication: allow_without_authentication
+
 ### 0.4.1 - 2019-04-19
 - added support for verbose debug of the connection and sending process via a new method: $mail->debugSend()
 

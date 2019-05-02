@@ -2,7 +2,7 @@
 /*******************************************************************************
   *  WireMailSmtp | WireMailSmtpConfig
   * ---------------------------------------------------------------------------
-  *  @version     -   '0.4.1'
+  *  @version     -   '0.4.2'
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
 *******************************************************************************/
@@ -77,6 +77,24 @@ class WireMailSmtpConfig extends Wire {
             $field->icon = 'sign-out';
             $fieldset->add($field);
 
+            // ALLOW WITHOUT ANY AUTHENTICATION
+            $field = $modules->get('InputfieldCheckbox');
+            $field->attr('name', 'allow_without_authentication');
+            $field->attr('id', 'allow_without_authentication');
+            $field->attr('value', 1);
+            $field->attr('checked', $data['allow_without_authentication'] ? 'checked' : '');
+            $field->label = $this->_('Allow Connection without Authentication');
+            $field->description = $this->_('Server allows connecting without Authentication Credentials');
+            if(isset($siteconfig['allow_without_authentication'])) {
+                $field->notes = $this->attentionMessage($siteconfig['allow_without_authentication']);
+                $field->attr('tabindex', '-1');
+            } else {
+                $field->notes = $this->_('Default: unchecked');
+            }
+            $field->columnWidth = 33;
+            $field->icon = 'unlock';
+            $fieldset->add($field);
+
             // SMTP USER
             $field = $modules->get('InputfieldText');
             $field->attr('name', 'smtp_user');
@@ -87,7 +105,7 @@ class WireMailSmtpConfig extends Wire {
                 $field->notes = $this->attentionMessage($siteconfig['smtp_user']);
                 $field->attr('tabindex', '-1');
             }
-            $field->columnWidth = 50;
+            $field->columnWidth = 34;
             $field->icon = 'user';
             $fieldset->add($field);
 
@@ -104,7 +122,7 @@ class WireMailSmtpConfig extends Wire {
             } else {
                 $field->notes = $this->_('**Note**: Password is stored as plain text in database.');
             }
-            $field->columnWidth = 50;
+            $field->columnWidth = 33;
             $field->icon = 'asterisk';
             $fieldset->add($field);
 
@@ -482,11 +500,12 @@ class WireMailSmtpConfig extends Wire {
             'smtp_host',
             'smtp_port',
             'smtp_ssl',
-            //'smtp_ssl_crypto_method',
+            'smtp_ssl_crypto_method',
             'smtp_start_tls',
             'smtp_tls_crypto_method',
             'smtp_user',
             'smtp_password',
+            'allow_without_authentication',
             'smtp_certificate',
             'realm',
             'workstation',
