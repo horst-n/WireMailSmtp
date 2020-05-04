@@ -140,7 +140,7 @@ class WireMailSmtpConfig extends Wire {
                 $field->attr('tabindex', '-1');
             }
             $field->icon = 'lock';
-            $field->showIf = 'smtp_ssl=0';
+            //$field->showIf = 'smtp_ssl=0';
             $fieldset->add($field);
 
             // TLS crypto method
@@ -158,7 +158,7 @@ class WireMailSmtpConfig extends Wire {
             }
             $field->columnWidth = 50;
             $field->icon = 'lock';
-            $field->showIf = 'smtp_start_tls=1';
+            //$field->showIf = 'smtp_start_tls=1';
             $fieldset->add($field);
 
             // SMTP SSL
@@ -175,7 +175,7 @@ class WireMailSmtpConfig extends Wire {
                 $field->attr('tabindex', '-1');
             }
             $field->icon = 'lock';
-            $field->showIf = 'smtp_start_tls=0';
+            //$field->showIf = 'smtp_start_tls=0';
             $fieldset->add($field);
             // SSL crypto method
 //            $field = $modules->get('InputfieldSelect');
