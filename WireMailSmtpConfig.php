@@ -478,7 +478,7 @@ class WireMailSmtpConfig extends Wire {
                 $field->attr('value', '');
                 $field->label = $this->_('Subjectline');
                 $field->columnWidth = 50;
-                $field->icon = 'at';
+                $field->icon = 'pencil';
                 $fieldset->add($field);
 
                 $field = $modules->get('InputfieldTextarea');
@@ -486,6 +486,7 @@ class WireMailSmtpConfig extends Wire {
                 $field->attr('value', 'This is a test message. ÄÖÜ äöüß');
                 $field->label = $this->_('Bodycontent');
                 $field->columnWidth = 50;
+                $field->icon = 'envelope-o';
                 $fieldset->add($field);
 
             $form->add($fieldset);
@@ -496,7 +497,7 @@ class WireMailSmtpConfig extends Wire {
             $field = $modules->get('InputfieldMarkup');
             $field->attr('name', '_debug_log');
             $field->label = 'Debug Log';
-            $field->icon = 'cog';
+            $field->icon = 'heartbeat';
             $field->columnWidth = 100;
             $field->collapsed = Inputfield::collapsedNo;
             $field->attr('value', $this->testSettings());
@@ -530,7 +531,7 @@ class WireMailSmtpConfig extends Wire {
             $session->remove('debug_subjectline');
             $session->remove('debug_bodycontent');
 
-            if($from && $t) {
+            if($from && $to) {
                 // do a verbose debugging
                 if(!$subject) $subject = 'Debug Testmail';
                 if(!$body) $body = 'Debug Testmail, äöüß';
@@ -555,7 +556,7 @@ class WireMailSmtpConfig extends Wire {
             $dump = $e->getMessage();
         }
 
-        $outputTemplate = "<pre style=\"overflow:scroll !important; margin:15px auto; padding:10px; background-color:#ffddff; color:#555; border:1px solid #AAA; font-family:'Hack', 'Source Code Pro', 'Lucida Console', 'Courier', monospace; font-size:12px; line-height:15px;\">".str_replace(array('<br>', '<br/>', '<br />'), '', $dump) ."</pre>";
+        $outputTemplate = "<pre style=\"overflow:scroll !important; margin:15px auto; padding:10px; background-color:#ffeedd; color:#000; border:1px solid #AAA; font-family:'Hack', 'Source Code Pro', 'Lucida Console', 'Courier', monospace; font-size:12px; line-height:15px;\">".str_replace(array('<br>', '<br/>', '<br />'), '', $dump) ."</pre>";
         return $outputTemplate;
     }
 
@@ -567,7 +568,7 @@ class WireMailSmtpConfig extends Wire {
 
     private function finalSettingsMessage($siteconfig) {
 
-        $outputTemplate = "<pre style=\"overflow:scroll !important; margin:15px auto; padding:10px 10px 10px 10px; background-color:#ffffdd; color:#555; border:1px solid #AAA; font-family:'Hack', 'Source Code Pro', 'Lucida Console', 'Courier', monospace; font-size:12px; line-height:15px;\">[__CONTENT__]</pre>";
+        $outputTemplate = "<pre style=\"overflow:scroll !important; margin:15px auto; padding:10px; background-color:#ffffdd; color:#555; border:1px solid #AAA; font-family:'Hack', 'Source Code Pro', 'Lucida Console', 'Courier', monospace; font-size:12px; line-height:15px;\">[__CONTENT__]</pre>";
 
         if(!count($siteconfig)) {
             $content = 'There are no overriding settings defined in your site/config.php';
