@@ -1,6 +1,9 @@
 # Changelog
 
 
+### 0.5.0 - 2020-05-04
+- added a verbose debug testconnection into the configpage
+
 ### 0.4.2 - 2019-05-02
 - added support for connections without authentication: allow_without_authentication
 

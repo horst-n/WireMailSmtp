@@ -140,7 +140,7 @@ class WireMailSmtpConfig extends Wire {
                 $field->attr('tabindex', '-1');
             }
             $field->icon = 'lock';
-            $field->showOnlyIf = 'smtp_ssl=0';
+            $field->showIf = 'smtp_ssl=0';
             $fieldset->add($field);
 
             // TLS crypto method
@@ -158,6 +158,7 @@ class WireMailSmtpConfig extends Wire {
             }
             $field->columnWidth = 50;
             $field->icon = 'lock';
+            $field->showIf = 'smtp_start_tls=1';
             $fieldset->add($field);
 
             // SMTP SSL
@@ -174,7 +175,7 @@ class WireMailSmtpConfig extends Wire {
                 $field->attr('tabindex', '-1');
             }
             $field->icon = 'lock';
-            $field->showOnlyIf = 'smtp_start_tls=0';
+            $field->showIf = 'smtp_start_tls=0';
             $fieldset->add($field);
             // SSL crypto method
 //            $field = $modules->get('InputfieldSelect');
@@ -444,11 +445,72 @@ class WireMailSmtpConfig extends Wire {
         $field->icon = 'heartbeat';
         $form->add($field);
 
+            // OPTIONAL VERBOSE DEBUGGING
+            $fieldset = $modules->get('InputfieldFieldset');
+            $fieldset->label = $this->_('Verbose Debug settings');
+            $fieldset->attr('name', '_verbosedebug');
+            $fieldset->collapsed = Inputfield::collapsedNo;
+            $fieldset->showIf = '_test_settings=1';
+            $fieldset->icon = 'heartbeat';
+
+                $field = $modules->get('InputfieldText');
+                $field->attr('name', 'debug_senderemail');
+                $field->attr('value', $data['sender_email']);
+                $field->label = $this->_('Sender Email Address');
+                if(isset($siteconfig['sender_email'])) {
+                    $field->notes = $this->attentionMessage($siteconfig['sender_email']);
+                    $field->attr('tabindex', '-1');
+                }
+                $field->columnWidth = 50;
+                $field->icon = 'at';
+                $fieldset->add($field);
+
+                $field = $modules->get('InputfieldText');
+                $field->attr('name', 'debug_recipientemail');
+                $field->attr('value', '');
+                $field->label = $this->_('Recipient Email Address');
+                $field->columnWidth = 50;
+                $field->icon = 'at';
+                $fieldset->add($field);
+
+                $field = $modules->get('InputfieldText');
+                $field->attr('name', 'debug_subjectline');
+                $field->attr('value', '');
+                $field->label = $this->_('Subjectline');
+                $field->columnWidth = 50;
+                $field->icon = 'at';
+                $fieldset->add($field);
+
+                $field = $modules->get('InputfieldTextarea');
+                $field->attr('name', 'debug_bodycontent');
+                $field->attr('value', 'This is a test message. ÄÖÜ äöüß');
+                $field->label = $this->_('Bodycontent');
+                $field->columnWidth = 50;
+                $fieldset->add($field);
+
+            $form->add($fieldset);
+
+
         if(wire('session')->test_settings) {
-            wire('session')->remove('test_settings');
-            $field->notes = $this->testSettings();
+            // EXECUTE DEBUG CONNECTION AND DISPLAY LOG
+            $field = $modules->get('InputfieldMarkup');
+            $field->attr('name', '_debug_log');
+            $field->label = 'Debug Log';
+            $field->icon = 'cog';
+            $field->columnWidth = 100;
+            $field->collapsed = Inputfield::collapsedNo;
+            $field->attr('value', $this->testSettings());
+            $form->add($field);
+
         } else if(wire('input')->post->_test_settings) {
-            wire('session')->set('test_settings', 1);
+            // PREPARE SESSION FOR DEBUGGING
+            $session = wire('session');
+            $session->set('test_settings', 1);
+            $post = wire('input')->post;
+            $session->set('debug_senderemail', $post->debug_senderemail);
+            $session->set('debug_recipientemail', $post->debug_recipientemail);
+            $session->set('debug_subjectline', $post->debug_subjectline);
+            $session->set('debug_bodycontent', $post->debug_bodycontent);
         }
 
         return $form;
@@ -456,28 +518,45 @@ class WireMailSmtpConfig extends Wire {
 
 
     public function testSettings() {
-
-        $errors = array();
-        $success = false;
-        $module = wire('modules')->get('WireMailSmtp');
-
         try {
-            $a = $module->getAdaptor();
-            $success = $a->testConnection();
+            $session = wire('session');
+            $from    = $session->get('debug_senderemail');
+            $to      = array($session->get('debug_recipientemail'));
+            $subject = $session->get('debug_subjectline');
+            $body    = $session->get('debug_bodycontent');
+            $session->remove('test_settings');
+            $session->remove('debug_senderemail');
+            $session->remove('debug_recipientemail');
+            $session->remove('debug_subjectline');
+            $session->remove('debug_bodycontent');
+
+            if($from && $t) {
+                // do a verbose debugging
+                if(!$subject) $subject = 'Debug Testmail';
+                if(!$body) $body = 'Debug Testmail, äöüß';
+                $mail = wireMail();
+                if($mail->className != 'WireMailSmtp') {
+                    $dump = "<p>Couldn't get the right WireMail-Module (WireMailSmtp). found: {$mail->className}</p>";
+                } else {
+                    $mail->from = $from;
+                    $mail->to($to);
+                    $mail->subject($subject);
+                    $mail->sendSingle(true);
+                    $mail->body($body);
+                    $dump = $mail->debugSend(3);
+                }
+            } else {
+                // only try a testconnection
+                $module = wire('modules')->get('WireMailSmtp');
+                $a = $module->getAdaptor();
+                if($a->testConnection()) $dump = $this->_('SUCCESS! SMTP settings appear to work correctly.');
+            }
         } catch(Exception $e) {
-            $errors[] = $e->getMessage();
+            $dump = $e->getMessage();
         }
 
-        if($success) {
-            $note = $this->_('SUCCESS! SMTP settings appear to work correctly.');
-            $this->message($note);
-        } else {
-            $note = $this->_('ERROR: SMTP settings did not work.');
-            $this->error($note);
-            foreach($a->getErrors() as $error) $this->error($error);
-        }
-
-        return $note;
+        $outputTemplate = "<pre style=\"overflow:scroll !important; margin:15px auto; padding:10px; background-color:#ffddff; color:#555; border:1px solid #AAA; font-family:'Hack', 'Source Code Pro', 'Lucida Console', 'Courier', monospace; font-size:12px; line-height:15px;\">".str_replace(array('<br>', '<br/>', '<br />'), '', $dump) ."</pre>";
+        return $outputTemplate;
     }
 
 
