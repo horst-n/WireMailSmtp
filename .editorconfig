@@ -1,6 +1,3 @@
-; top-most EditorConfig file
-root = true
-
 [*.{php,module}]
 end_of_line = LF
 indent_style = space
