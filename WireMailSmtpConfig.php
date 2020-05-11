@@ -2,7 +2,7 @@
 /*******************************************************************************
   *  WireMailSmtp | WireMailSmtpConfig
   * ---------------------------------------------------------------------------
-  *  @version     -   '0.5.0'
+  *  @version     -   '0.5.1'
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
 *******************************************************************************/
@@ -457,10 +457,10 @@ class WireMailSmtpConfig extends Wire {
                 $field->attr('name', 'debug_senderemail');
                 $field->attr('value', $data['sender_email']);
                 $field->label = $this->_('Sender Email Address');
-                if(isset($siteconfig['sender_email'])) {
-                    $field->notes = $this->attentionMessage($siteconfig['sender_email']);
-                    $field->attr('tabindex', '-1');
-                }
+//                if(isset($siteconfig['sender_email'])) {
+//                    $field->notes = $this->attentionMessage($siteconfig['sender_email']);
+//                    $field->attr('tabindex', '-1');
+//                }
                 $field->columnWidth = 50;
                 $field->icon = 'at';
                 $fieldset->add($field);
@@ -550,7 +550,11 @@ class WireMailSmtpConfig extends Wire {
                 // only try a testconnection
                 $module = wire('modules')->get('WireMailSmtp');
                 $a = $module->getAdaptor();
-                if($a->testConnection()) $dump = $this->_('SUCCESS! SMTP settings appear to work correctly.');
+                if($a->testConnection()) {
+                    $dump = $this->_("SUCCESS! SMTP settings appear to work correctly.");
+                } else {
+                    $dump = $this->_("FAILURE! SMTP settings doesn't appear to work.");
+                }
             }
         } catch(Exception $e) {
             $dump = $e->getMessage();

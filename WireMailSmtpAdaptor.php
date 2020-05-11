@@ -2,8 +2,8 @@
 /*******************************************************************************
   *  WireMailSmtp | hnsmtp
   *
-  *  @version     -   '0.5.0'
-  *  @date        -   2020/05/04
+  *  @version     -   '0.5.1'
+  *  @date        -   2020/05/11
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
   *  @licence     -   MIT - https://processwire.com/about/license/mit/

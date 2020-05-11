@@ -1,6 +1,9 @@
 # Changelog
 
 
+### 0.5.1 - 2020-05-11
+- minor fix to testconnection in the configpage
+
 ### 0.5.0 - 2020-05-04
 - added a verbose debug testconnection into the configpage
 
