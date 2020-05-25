@@ -1,6 +1,9 @@
 # Changelog
 
 
+### 0.5.2 - 2020-05-25
+- changed Manuel Lemos smtp-class to new version 1.52, as he added a new token feature
+
 ### 0.5.1 - 2020-05-11
 - minor fix to testconnection in the configpage
 
