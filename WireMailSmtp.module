@@ -6,7 +6,7 @@
  * from M. Lemos (http://www.phpclasses.org/browse/author/1.html) into ProcessWire.
  *
  *
- * @copyright Copyright (c) 2014 - 2020, Horst Nogajski
+ * @copyright Copyright (c) 2014 - 2021, Horst Nogajski
  * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License, version 2
  * OR
  * @license https://processwire.com/about/license/mit/
@@ -23,7 +23,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
     public static function getModuleInfo() {
         return array(
             'title'     => 'Wire Mail SMTP',
-            'version'   => '0.5.2',
+            'version'   => '0.6.0',
             'summary'   => "Extends WireMail, uses SMTP protocol (plain | SSL | TLS), provides: to, cc, bcc, attachments, priority, disposition notification, bulksending, ...",
             'href'      => 'https://processwire.com/talk/topic/5704-module-wiremailsmtp/',
             'author'    => 'horst',
@@ -278,7 +278,9 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
      */
     public function __construct() {
         $this->mail['header']['X-Mailer'] = "ProcessWire/" . $this->className();
-        foreach(self::getDefaultData() as $key => $value) $this->$key = $value;
+        foreach(self::getDefaultData() as $key => $value) {
+            $this->$key = $value;
+        }
     }
 
 
