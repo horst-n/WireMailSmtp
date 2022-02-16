@@ -1,7 +1,5 @@
 # Changelog
 
-### 0.6.0 - 2021-04-15
-- PHP 8 support
 
 ### 0.5.2 - 2020-05-25
 - changed Manuel Lemos smtp-class to new version 1.52, as he added a new token feature

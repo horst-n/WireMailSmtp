@@ -2,8 +2,8 @@
 /*******************************************************************************
   *  WireMailSmtp | hnsmtp
   *
-  *  @version     -   '0.6.0'
-  *  @date        -   2021/04/15
+  *  @version     -   '0.5.2'
+  *  @date        -   2020/05/25
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
   *  @licence     -   MIT - https://processwire.com/about/license/mit/
@@ -98,11 +98,12 @@ class hnsmtp {
 	}
 
 
-	protected function set_var_val( $k, $v ) {
-        if(!isset($this->aValidVars[$k])) {
+
+
+	private function set_var_val( $k, $v ) {
+		if(!in_array($k, $this->aValidVars)) {
 			return;
 		}
-
 		switch($k) {
 			case 'send_sender_signature':
 			case 'smtp_port':
@@ -220,12 +221,12 @@ class hnsmtp {
 
 
 
-	protected function logError($msg) {
+	private function logError($msg) {
 		if(!isset($this->module)) $this->module = wire('modules')->get('WireMailSmtp');
 		$this->module->logError($msg);
 	}
 
-	protected function logActivity($msg) {
+	private function logActivity($msg) {
 		if(!isset($this->module)) $this->module = wire('modules')->get('WireMailSmtp');
 		$this->module->logActivity($msg);
 	}
@@ -271,7 +272,7 @@ class hnsmtp {
 	}
 
 
-	public function setTextBody($text, $addSignature, $wrapText, &$maildata) {
+	public function setTextBody($text, $addSignature, $wrapText=true, &$maildata) {
 		if($addSignature===true && isset($this->sender_signature) && is_string($this->sender_signature) && strlen(trim($this->sender_signature))>0) {
 			$text .= "\r\n\r\n" . $this->sender_signature;
 		}
@@ -286,7 +287,7 @@ class hnsmtp {
 	}
 
 
-	public function setTextAndHtmlBody($text, $html, $addSignature, $wrapText, &$maildata1, &$maildata2) {
+	public function setTextAndHtmlBody($text, $html, $addSignature, $wrapText=true, &$maildata1, &$maildata2) {
 		if($addSignature===true && isset($this->sender_signature) && is_string($this->sender_signature) && strlen(trim($this->sender_signature))>0) {
 			$text .= "\r\n\r\n--\r\n" . $this->sender_signature;
 		}
@@ -361,7 +362,7 @@ class hnsmtp {
 
 
 
-	public function send($debugServer=false, $htmlDebug=false, &$maildata='') {
+	public function send($debugServer=false, $htmlDebug=false, &$maildata) {
         if($debugServer) $this->emailMessage->smtp_debug = 1;
         if($htmlDebug) $this->emailMessage->smtp_html_debug = 1;
 		if(!$this->connect()) {
@@ -424,7 +425,7 @@ class hnsmtp {
 	}
 
 
-	protected function bundleEmailAndName($email, $name) {
+	private function bundleEmailAndName($email, $name) {
 		$email = strtolower(trim($email));
 		$clean = wire('sanitizer')->email($email);
 		if(!strlen($name)) return $email;
