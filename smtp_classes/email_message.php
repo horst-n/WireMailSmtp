@@ -672,7 +672,7 @@ class email_message_class
 		if(strlen($host)
 		&& $host[strlen($host)-1]=="-")
 			$host=substr($host,0,strlen($host)-1);
-		return($this->FormatHeader("Message-ID", "<".strftime("%Y%m%d%H%M%S", $seconds).substr($micros,1,5).".".preg_replace('/[^A-Za-z]/', '-', $local)."@".preg_replace('/[^.A-Za-z_-]/', '', $host).">"));
+		return($this->FormatHeader("Message-ID", "<".date("YmdHMS", $seconds).substr($micros,1,5).".".preg_replace('/[^A-Za-z]/', '-', $local)."@".preg_replace('/[^.A-Za-z_-]/', '', $host).">"));
 	}
 
 	Function SendMail($to, $subject, $body, $headers, $return_path)
