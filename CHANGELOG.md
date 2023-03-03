@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.6.1 - 2023-03-03
+- PHP 8.1 / 8.2 support by PR from @romaincazier
+
 ### 0.6.0 - 2021-04-15
 - PHP 8 support
 
