@@ -200,9 +200,9 @@ class hnsmtp {
 		$this->emailMessage->smtp_certificate             = $this->smtp_certificate;
 
 		// advanced SMTP Server Settings
-		$this->emailMessage->realm                        = $this->realm;
-		$this->emailMessage->workstation                  = $this->workstation;
-		$this->emailMessage->authentication_mechanism     = $this->authentication_mechanism;
+		$this->emailMessage->smtp_realm                        = $this->realm;
+		$this->emailMessage->smtp_workstation                  = $this->workstation;
+		$this->emailMessage->smtp_authentication_mechanism     = $this->authentication_mechanism;
 
 		// Debug on / off
 		$this->emailMessage->smtp_debug                   = $this->smtp_debug;
