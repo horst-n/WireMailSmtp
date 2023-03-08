@@ -6,10 +6,16 @@
  *
  */
 /**
-*   @horst, 19.04.2019:
+*
+*   @horst, 2023-03-08:
+*       added property $pending_sender to correct PHP 8.2 deprecation warning:
+*           'Creation of dynamic property smtp_class::$pending_sender is deprecated'
+*
+*   @horst, 2019-04-19:
 *       added support for: smtp_tls_crypto_method
 *
-*
+*   @flydev, 2016-02-14:
+*       allow self signed certificate: https://processwire.com/talk/topic/5704-wiremailsmtp/page/4/#comment-113290
 */
 /*
 {metadocument}<?xml version="1.0" encoding="ISO-8859-1"?>
@@ -595,6 +601,9 @@ class smtp_class
 
     /* Server allows connecting without user name and password */
     var $allow_without_authentication = 0;  // @horst
+
+    /* PHP 8.2 Correction: Creation of dynamic property smtp_class::$pending_sender is deprecated */
+    var $pending_sender = 0;  // @horst
 
 	/* Allow self signed certificate */
 	var $smtp_certificate = false;   // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290

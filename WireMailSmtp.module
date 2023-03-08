@@ -23,7 +23,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
     public static function getModuleInfo() {
         return array(
             'title'     => 'Wire Mail SMTP',
-            'version'   => '0.6.1',
+            'version'   => '0.6.2',
             'summary'   => "Extends WireMail, uses SMTP protocol (plain | SSL | TLS), provides: to, cc, bcc, attachments, priority, disposition notification, bulksending, ...",
             'href'      => 'https://processwire.com/talk/topic/5704-module-wiremailsmtp/',
             'author'    => 'horst',
@@ -127,7 +127,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
             'send_sender_signature'        => '1',    // when the signature should be send: with every mail | only when the default Email is the sender | only when explicitly called via the API
             'extra_headers'                => '',     // optional Custom-Meta-Headers
             'valid_recipients'             => '',     // email addresses of valid recipients. String that we convert to array at runtime.
-            'smtp_certificate'             => 0          // allow or not self signed certificate (PHP >= 5.6)
+            'smtp_certificate'             => 0       // allow or not self signed certificate (PHP >= 5.6)
             );
     }
 
