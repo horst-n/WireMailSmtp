@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.6.3 - 2023-03-09
+- PR to support "Enforce sender in emails", from @eerojaaskelainen, many thanks!
+
 ### 0.6.2 - 2023-03-08
 - PHP 8.2 support, minor fix of deprecated creation of dynamic property smtp_class::$pending_sender
 

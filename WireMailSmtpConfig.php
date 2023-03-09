@@ -2,7 +2,7 @@
 /*******************************************************************************
   *  WireMailSmtp | WireMailSmtpConfig
   * ---------------------------------------------------------------------------
-  *  @version     -   '0.6.0'
+  *  @version     -   '0.6.3'
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
 *******************************************************************************/
@@ -283,7 +283,7 @@ class WireMailSmtpConfig extends Wire {
                 $field->notes = $this->attentionMessage($siteconfig['sender_email']);
                 $field->attr('tabindex', '-1');
             }
-            $field->columnWidth = 50;
+            $field->columnWidth = 40;
             $field->icon = 'at';
             $fieldset->add($field);
 
@@ -296,8 +296,24 @@ class WireMailSmtpConfig extends Wire {
                 $field->notes = $this->attentionMessage($siteconfig['sender_name']);
                 $field->attr('tabindex', '-1');
             }
-            $field->columnWidth = 50;
+            $field->columnWidth = 40;
             $field->icon = 'user';
+            $fieldset->add($field);
+
+            // FORCE USERNAME AS SENDER
+            $field = $modules->get('InputfieldCheckbox');
+            $field->attr('name', 'force_sender');
+            $field->attr('id', 'force_sender');
+            $field->attr('value', 1);
+            $field->attr('checked', isset($data['force_sender']) && $data['force_sender'] ? 'checked' : '');
+            $field->columnWidth = 20;
+            $field->label = $this->_('Force SMTP User as sender');
+            $field->description = $this->_('Check if SMTP allows messages only from mailbox user. This will force From-field as set in this configuration.');
+            if(isset($siteconfig['force_sender'])) {
+                $field->notes = $this->attentionMessage($siteconfig['force_sender']);
+                $field->attr('tabindex', '-1');
+            }
+            $field->icon = 'user-circle-o';
             $fieldset->add($field);
 
             // SENDER REPLY EMAIL
