@@ -520,7 +520,10 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
      *
      */
     public function from($email = '', $name = null) {
-        if(is_null($name)) list($email, $name) = $this->extractEmailAndName($email);
+        if ($this->force_sender == 1){
+           $email = '';
+        }
+        elseif(is_null($name)) list($email, $name) = $this->extractEmailAndName($email);
             if(empty($email)) {
                 $email = $this->sender_email;
                 $name = $this->sender_name;
