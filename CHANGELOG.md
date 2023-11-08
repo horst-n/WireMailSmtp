@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.6.4 - 2023-11-08
+- PHP 8.2 support, minor fix of deprecated creation of dynamic property hnsmtp::$module
+
 ### 0.6.3 - 2023-03-09
 - PR to support "Enforce sender in emails", from @eerojaaskelainen, many thanks!
 
