@@ -23,7 +23,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
     public static function getModuleInfo() {
         return array(
             'title'     => 'Wire Mail SMTP',
-            'version'   => '0.6.3',
+            'version'   => '0.6.4',
             'summary'   => "Extends WireMail, uses SMTP protocol (plain | SSL | TLS), provides: to, cc, bcc, attachments, priority, disposition notification, bulksending, ...",
             'href'      => 'https://processwire.com/talk/topic/5704-module-wiremailsmtp/',
             'author'    => 'horst',
@@ -675,7 +675,8 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
             $this->logError("You have set sendSingle to true, but also you have provided more than one TO-Recipient. We now change the sending method to send multiple messages!");
         }
 
-        // send a single email an quit
+
+        // send a single email and QUIT
         if($this->mail['sendSingle']) {
 
             // with sending only a single mail, we may also use cc and bcc recipients
@@ -695,6 +696,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
 
             // correct the recipient headers >>>
             $tmpTO = $tmpCC = $tmpBCC = array();
+
             foreach($this->maildata['recipients'] as $tmpRecipient) {
                 $tmpRecipientStr = strlen(trim($tmpRecipient['name'])) > 0 ? '"'. trim($tmpRecipient['name']) .'" ' : '';
                 $tmpRecipientStr .= '<'. trim($tmpRecipient['emailaddress']) .'>';

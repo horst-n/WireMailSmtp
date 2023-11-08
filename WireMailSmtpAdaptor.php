@@ -2,8 +2,8 @@
 /*******************************************************************************
   *  WireMailSmtp | hnsmtp
   *
-  *  @version     -   '0.6.0'
-  *  @date        -   2021/04/15
+  *  @version     -   '0.6.4'
+  *  @date        -   2023/11/08
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
   *  @licence     -   MIT - https://processwire.com/about/license/mit/
@@ -18,6 +18,8 @@ require_once( dirname(__FILE__) . '/smtp_classes/sasl.php' );
 
 
 class hnsmtp {
+
+    private $module                        = null;
 
 	private $default_charset               = 'UTF-8';
 
@@ -221,12 +223,12 @@ class hnsmtp {
 
 
 	protected function logError($msg) {
-		if(!isset($this->module)) $this->module = wire('modules')->get('WireMailSmtp');
+		$this->module = wire('modules')->get('WireMailSmtp');
 		$this->module->logError($msg);
 	}
 
 	protected function logActivity($msg) {
-		if(!isset($this->module)) $this->module = wire('modules')->get('WireMailSmtp');
+		$this->module = wire('modules')->get('WireMailSmtp');
 		$this->module->logActivity($msg);
 	}
 
