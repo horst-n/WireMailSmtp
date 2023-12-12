@@ -324,7 +324,7 @@ class email_message_class
 	var $line_break="\n";
 	var $line_length=76;
 	var $ruler="_";
-	var $email_address_pattern="([-!#\$%&'*+./0-9=?A-Z^_`a-z{|}~])+@([-!#\$%&'*+/0-9=?A-Z^_`a-z{|}~]+\\.)+[a-zA-Z]{2,6}";
+	var $email_address_pattern="([-!#\$%&'*+./0-9=?A-Z^_`a-z{|}~])+@([-!#\$%&'*+/0-9=?A-Z^_`a-z{|}~]+\\.)+[a-zA-Z]{2,24}";
 	var $bulk_mail=0;
 
 	/* Public variables */
