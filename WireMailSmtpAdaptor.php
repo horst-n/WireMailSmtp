@@ -274,8 +274,16 @@ class hnsmtp {
 
 
 	public function setTextBody($text, $addSignature, $wrapText, &$maildata) {
+		if (wire('languages')) {
+			$userLanguage = wire('user')->language;
+			$lang = $userLanguage->isDefault() ? '' : "__$userLanguage->id";
+		}
+		else {
+			$lang = '';
+		}
+		$moduleData = wire('modules')->get('WireMailSmtp');
 		if($addSignature===true && isset($this->sender_signature) && is_string($this->sender_signature) && strlen(trim($this->sender_signature))>0) {
-			$text .= "\r\n\r\n" . $this->sender_signature;
+			$text .= "\r\n\r\n" . $moduleData['sender_signature' . $lang] ? $moduleData['sender_signature' . $lang] : $moduleData['sender_signature'];
 		}
 		$text = $wrapText ? $this->emailMessage->WrapText($text) : (string)$text;
 		$maildata = $text;
@@ -289,15 +297,23 @@ class hnsmtp {
 
 
 	public function setTextAndHtmlBody($text, $html, $addSignature, $wrapText, &$maildata1, &$maildata2) {
+		if (wire('languages')) {
+			$userLanguage = wire('user')->language;
+			$lang = $userLanguage->isDefault() ? '' : "__$userLanguage->id";
+		}
+		else {
+			$lang = '';
+		}
+		$moduleData = wire('modules')->get('WireMailSmtp');
 		if($addSignature===true && isset($this->sender_signature) && is_string($this->sender_signature) && strlen(trim($this->sender_signature))>0) {
-			$text .= "\r\n\r\n--\r\n" . $this->sender_signature;
+			$text .= "\r\n\r\n--\r\n" . $moduleData['sender_signature' . $lang] ? $moduleData['sender_signature' . $lang] : $moduleData['sender_signature'];
 		}
 		if($addSignature===true && isset($this->sender_signature_html) && is_string($this->sender_signature_html) && strlen(trim($this->sender_signature_html))>0) {
             // we first need to check if there is a </body> end tag in the html-markup
             if(preg_match('</body>', $html)) {
-                $html = str_replace("</body>", "\r\n\r\n" . $this->sender_signature_html . "\r\n</body>", $html);
+                $html = str_replace("</body>", "\r\n\r\n" . $moduleData['sender_signature_html' . $lang] ? $moduleData['sender_signature_html' . $lang] : $moduleData['sender_signature_html'] . "\r\n</body>", $html);
             } else {
-                $html .= "\r\n\r\n" . $this->sender_signature_html . "\r\n";
+                $html .= "\r\n\r\n" . $moduleData['sender_signature_html' . $lang] ? $moduleData['sender_signature_html' . $lang] : $moduleData['sender_signature_html'] . "\r\n";
             }
 		}
 

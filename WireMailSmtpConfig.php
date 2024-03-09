@@ -359,6 +359,7 @@ class WireMailSmtpConfig extends Wire {
             }
             $field->columnWidth = 33;
             $field->icon = 'pencil';
+            $field->useLanguages = true;
             $fieldset->add($field);
 
             // SENDER SIGNATURE (HTML)
@@ -373,6 +374,7 @@ class WireMailSmtpConfig extends Wire {
             }
             $field->columnWidth = 33;
             $field->icon = 'code';
+            $field->useLanguages = true;
             $fieldset->add($field);
 
             // SENDER SEND SIGNATURE
