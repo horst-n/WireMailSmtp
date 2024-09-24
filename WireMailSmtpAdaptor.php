@@ -1,8 +1,8 @@
-<?php
+<?php namespace ProcessWire;
 /*******************************************************************************
   *  WireMailSmtp | hnsmtp
   *
-  *  @version     -   '0.6.4'
+  *  @version     -   '0.8.0'
   *  @date        -   2023/11/08
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
@@ -185,7 +185,7 @@ class hnsmtp {
 		}
 
 		// start SMTP-Mail
-		$this->emailMessage = new smtp_message_class();
+		$this->emailMessage = new \smtp_message_class();
 
 		// SMTP Server Authentication
 		$this->emailMessage->default_charset              = $this->default_charset;
