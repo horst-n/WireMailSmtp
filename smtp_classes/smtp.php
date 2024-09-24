@@ -2,7 +2,7 @@
 /*
  * smtp.php
  *
- * @(#) $Header: /opt2/ena/metal/smtp/smtp.php,v 1.52 2020/01/13 06:22:23 mlemos Exp $
+ * @(#) $Header: /opt2/ena/metal/smtp/smtp.php,v 1.57 2024/02/17 10:33:03 mlemos Exp $
  *
  */
 /**
@@ -23,7 +23,7 @@
 
 	<package>net.manuellemos.smtp</package>
 
-	<version>@(#) $Id: smtp.php,v 1.52 2020/01/13 06:22:23 mlemos Exp $</version>
+	<version>@(#) $Id: smtp.php,v 1.57 2024/02/17 10:33:03 mlemos Exp $</version>
 	<copyright>Copyright (C) Manuel Lemos 1999-2011</copyright>
 	<title>Sending e-mail messages via SMTP protocol</title>
 	<author>Manuel Lemos</author>
@@ -151,6 +151,109 @@ class smtp_class
 {/metadocument}
 */
 	var $token="";
+
+/*
+{metadocument}
+	<variable>
+		<name>token_file</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the user authentication token file needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $token_file="";
+
+/*
+{metadocument}
+	<variable>
+		<name>authentication_server</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the authentication server needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $authentication_server="";
+
+/*
+{metadocument}
+	<variable>
+		<name>authentication_redirect_uri</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the authentication redirect URI needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $authentication_redirect_uri="";
+
+/*
+{metadocument}
+	<variable>
+		<name>authentication_client_id</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the authentication client id needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $authentication_client_id="";
+
+/*
+{metadocument}
+	<variable>
+		<name>authentication_client_secret</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the authentication client secret needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $authentication_client_secret="";
+
+/*
+{metadocument}
+	<variable>
+		<name>authentication_scope</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the authentication scope needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $authentication_scope="";
+
 /*
 {metadocument}
 	<variable>
@@ -308,7 +411,7 @@ class smtp_class
 	<variable>
 		<name>user_agent</name>
 		<type>STRING</type>
-		<value>SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.52 $)</value>
+		<value>SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.57 $)</value>
 		<documentation>
 			<purpose>Set the user agent used when connecting via an HTTP proxy.</purpose>
 			<usage>Change this value only if for some reason you want emulate a
@@ -317,7 +420,7 @@ class smtp_class
 	</variable>
 {/metadocument}
 */
-	var $user_agent='SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.52 $)';
+	var $user_agent='SMTP Class (http://www.phpclasses.org/smtpclass $Revision: 1.57 $)';
 
 /*
 {metadocument}
@@ -354,6 +457,30 @@ class smtp_class
 {/metadocument}
 */
 	var $start_tls = 0;
+
+/*
+{metadocument}
+	<variable>
+		<name>cryptographic_method</name>
+		<type>INTEGER</type>
+		<value>121</value>
+		<documentation>
+			<purpose>Define the cryptographic method to use after
+				connecting to the SMTP server when encryption is used
+				after the connection is established using TLS
+				protocol.</purpose>
+			<usage>Set to values defined in the <link>
+				<data>PHP documentation page about cryptographic
+				methods</data>
+				<url>https://www.php.net/manual/en/function.stream-socket-enable-crypto.php</url>
+			</link> if the default method is not accepted by the SMTP
+			server. You can use PHP constants like
+			STREAM_CRYPTO_METHOD_TLS_CLIENT .</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $cryptographic_method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
 
 /*
 {metadocument}
@@ -603,7 +730,7 @@ class smtp_class
     var $allow_without_authentication = 0;  // @horst
 
     /* PHP 8.2 Correction: Creation of dynamic property smtp_class::$pending_sender is deprecated */
-    var $pending_sender = 0;  // @horst
+    //var $pending_sender = 0;  // @horst || was now fixed in original code by M.Lemos
 
 	/* Allow self signed certificate */
 	var $smtp_certificate = false;   // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
@@ -637,6 +764,7 @@ class smtp_class
 	var $disconnected_error=0;
 	var $esmtp_host="";
 	var $maximum_piped_recipients=100;
+	var $pending_sender = 0;
 
 	/* Private methods - DO NOT CALL */
 
@@ -1057,6 +1185,7 @@ class smtp_class
 			return(0);
 		}
 		$sasl=new sasl_client_class;
+		$sasl->SetCredential("debug",$this->debug);
 		$sasl->SetCredential("user",$credentials["user"]);
 		$sasl->SetCredential("password",$credentials["password"]);
 		if(IsSet($credentials["realm"]))
@@ -1067,6 +1196,18 @@ class smtp_class
 			$sasl->SetCredential("mode",$credentials["mode"]);
 		if(IsSet($credentials["token"]))
 			$sasl->SetCredential("token",$credentials["token"]);
+		if(IsSet($credentials["token_file"]))
+			$sasl->SetCredential("token_file",$credentials["token_file"]);
+		if(IsSet($credentials["authentication_server"]))
+			$sasl->SetCredential("authentication_server",$credentials["authentication_server"]);
+		if(IsSet($credentials["authentication_redirect_uri"]))
+			$sasl->SetCredential("authentication_redirect_uri",$credentials["authentication_redirect_uri"]);
+		if(IsSet($credentials["authentication_client_id"]))
+			$sasl->SetCredential("authentication_client_id",$credentials["authentication_client_id"]);
+		if(IsSet($credentials["authentication_client_secret"]))
+			$sasl->SetCredential("authentication_client_secret",$credentials["authentication_client_secret"]);
+		if(IsSet($credentials["authentication_scope"]))
+			$sasl->SetCredential("authentication_scope",$credentials["authentication_scope"]);
 		do
 		{
 			$status=$sasl->Start($mechanisms,$message,$interactions);
@@ -1126,7 +1267,7 @@ class smtp_class
 						}
 						if(!$this->VerifyResultLines(array("235","334"),$responses))
 							return(0);
-						switch($this->result_code)
+						switch(IsSet($this->result_code) ? $this->result_code : '')
 						{
 							case "235":
 								$response="";
@@ -1136,7 +1277,7 @@ class smtp_class
 								$response=base64_decode($responses[0]);
 								break;
 							default:
-								$this->error="Authentication error: ".$responses[0];
+								$this->error="Authentication error: ".(count($responses) ? $responses[0] : 'No response was returned');
 								return(0);
 						}
 						break;
@@ -1418,55 +1559,67 @@ class smtp_class
 						    $credentials["workstation"]=$this->workstation;
 					    if(strlen($this->token))
 						    $credentials["token"]=$this->token;
-					    $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
-					    if(!$success
-					    && !strcmp($mechanism,"PLAIN"))
-					    {
-						    /*
-						     * Author:  Russell Robinson, 25 May 2003, http://www.tectite.com/
-						     * Purpose: Try various AUTH PLAIN authentication methods.
-						     */
-						    $mechanisms=array("PLAIN");
-						    $credentials=array(
-							    "user"=>$this->user,
-							    "password"=>$this->password
-						    );
-						    if(strlen($this->realm))
-						    {
-							    /*
-							     * According to: http://www.sendmail.org/~ca/email/authrealms.html#authpwcheck_method
-							     * some sendmails won't accept the realm, so try again without it
-							     */
-							    $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
-						    }
-						    if(!$success)
-						    {
-							    /*
-							     * It was seen an EXIM configuration like this:
-							     * user^password^unused
-							     */
-							    $credentials["mode"]=SASL_PLAIN_EXIM_DOCUMENTATION_MODE;
-							    $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
-						    }
-						    if(!$success)
-						    {
-							    /*
-							     * ... though: http://exim.work.de/exim-html-3.20/doc/html/spec_36.html
-							     * specifies: ^user^password
-							     */
-							    $credentials["mode"]=SASL_PLAIN_EXIM_MODE;
-							    $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
-						    }
-					    }
-                        if($success
-                        && strlen($mechanism)==0)
-					    {
-						    $this->error="it is not supported any of the authentication mechanisms required by the server";
-						    $success=0;
-					    }
-                    }
-				}
-			}
+					    if(strlen($this->token_file))
+						    $credentials["token_file"]=$this->token_file;
+					    if(strlen($this->authentication_server))
+						    $credentials["authentication_server"]=$this->authentication_server;
+				    	if(strlen($this->authentication_redirect_uri))
+					    	$credentials["authentication_redirect_uri"]=$this->authentication_redirect_uri;
+				    	if(strlen($this->authentication_client_id))
+					    	$credentials["authentication_client_id"]=$this->authentication_client_id;
+				    	if(strlen($this->authentication_client_secret))
+				    		$credentials["authentication_client_secret"]=$this->authentication_client_secret;
+				    	if(strlen($this->authentication_scope))
+				    		$credentials["authentication_scope"]=$this->authentication_scope;
+					        $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
+					        if(!$success
+					        && !strcmp($mechanism,"PLAIN"))
+					        {
+						        /*
+						        * Author:  Russell Robinson, 25 May 2003, http://www.tectite.com/
+						        * Purpose: Try various AUTH PLAIN authentication methods.
+						        */
+						        $mechanisms=array("PLAIN");
+						        $credentials=array(
+							        "user"=>$this->user,
+							        "password"=>$this->password
+						        );
+						        if(strlen($this->realm))
+						        {
+							        /*
+							        * According to: http://www.sendmail.org/~ca/email/authrealms.html#authpwcheck_method
+							        * some sendmails won't accept the realm, so try again without it
+							        */
+							        $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
+						        }
+						        if(!$success)
+						        {
+							        /*
+							        * It was seen an EXIM configuration like this:
+							        * user^password^unused
+							        */
+							        $credentials["mode"]=SASL_PLAIN_EXIM_DOCUMENTATION_MODE;
+							        $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
+						        }
+						        if(!$success)
+						        {
+							        /*
+							        * ... though: http://exim.work.de/exim-html-3.20/doc/html/spec_36.html
+							        * specifies: ^user^password
+							        */
+							        $credentials["mode"]=SASL_PLAIN_EXIM_MODE;
+							        $success=$this->SASLAuthenticate($mechanisms,$credentials,$authenticated,$mechanism);
+						        }
+					        }
+                            if($success
+                            && strlen($mechanism)==0)
+					        {
+						        $this->error="it is not supported any of the authentication mechanisms required by the server";
+						        $success=0;
+					        }
+                        }
+				    }
+			    }
 		}
 		if($success)
 		{
