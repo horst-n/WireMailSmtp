@@ -1498,7 +1498,7 @@ class smtp_class
                     // @horst: support for different TLS crypto methods in differend PHP versions,
                     // see: https://processwire.com/talk/topic/5704-wiremailsmtp/page/12/?tab=comments#comment-184229 (thanks @androbey !)
                     // and: https://www.php.net/manual/en/function.stream-socket-enable-crypto.php#119122
-                    $validTlsCryptoMethods = WireMailSmtp::getCryptoMethodsTLS();
+                    $validTlsCryptoMethods = ProcessWire\WireMailSmtp::getCryptoMethodsTLS();
                     // use the userdefined method or try to use the highest available method
                     $tls_crypto_method = in_array($this->smtp_tls_crypto_method, $validTlsCryptoMethods) ? $this->smtp_tls_crypto_method : array_shift($validTlsCryptoMethods);
                     if(($success = @stream_socket_enable_crypto($this->connection, 1, constant($tls_crypto_method)))) {
