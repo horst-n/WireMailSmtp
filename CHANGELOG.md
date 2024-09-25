@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.8.0 - 2024-09-25
+- PHP namespace implemented for all PW-module-files, therefor the backwards compatibility reduces to PW 3.0.62+ (formerly 2.4.1+)
+
 ### 0.6.4 - 2023-11-08
 - PHP 8.2 support, minor fix of deprecated creation of dynamic property hnsmtp::$module
 
