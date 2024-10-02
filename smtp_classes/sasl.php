@@ -2,7 +2,7 @@
 /*
  * sasl.php
  *
- * @(#) $Id: sasl.php,v 1.11 2005/10/31 18:43:27 mlemos Exp $
+ * @(#) $Id: sasl.php,v 1.14 2022/10/29 08:43:11 mlemos Exp $
  *
  */
 
@@ -27,8 +27,8 @@ class sasl_interact_class
 
 	<package>net.manuellemos.sasl</package>
 
-	<version>@(#) $Id: sasl.php,v 1.11 2005/10/31 18:43:27 mlemos Exp $</version>
-	<copyright>Copyright Â© (C) Manuel Lemos 2004</copyright>
+	<version>@(#) $Id: sasl.php,v 1.14 2022/10/29 08:43:11 mlemos Exp $</version>
+	<copyright>Copyright © (C) Manuel Lemos 2004</copyright>
 	<title>Simple Authentication and Security Layer client</title>
 	<author>Manuel Lemos</author>
 	<authoraddress>mlemos-at-acm.org</authoraddress>
@@ -121,7 +121,8 @@ class sasl_client_class
 		"LOGIN"    => array("login_sasl_client_class",    "login_sasl_client.php"    ),
 		"NTLM"     => array("ntlm_sasl_client_class",     "ntlm_sasl_client.php"     ),
 		"PLAIN"    => array("plain_sasl_client_class",    "plain_sasl_client.php"    ),
-		"Basic"    => array("basic_sasl_client_class",    "basic_sasl_client.php"    )
+		"Basic"    => array("basic_sasl_client_class",    "basic_sasl_client.php"    ),
+		"XOAUTH2"  => array("xoauth2_sasl_client_class",  "xoauth2_sasl_client.php"  )
 	);
 	var $credentials=array();
 
@@ -212,7 +213,7 @@ class sasl_client_class
 		<do>
 {/metadocument}
 */
-	Function GetCredentials(&$credentials,$defaults,&$interactions)
+	Function GetCredentials(&$credentials,$defaults,&$interactions, $optional_credentials = array())
 	{
 		Reset($credentials);
 		$end=(GetType($key=Key($credentials))!="string");
@@ -222,7 +223,7 @@ class sasl_client_class
 			{
 				if(IsSet($defaults[$key]))
 					$credentials[$key]=$defaults[$key];
-				else
+				elseif(!IsSet($optional_credentials[$key]))
 				{
 					$this->error="the requested credential ".$key." is not defined";
 					return(SASL_NOMECH);
@@ -326,6 +327,9 @@ class sasl_client_class
 							break;
 						case SASL_CONTINUE:
 							$this->mechanism=$mechanism;
+							return($status);
+						case SASL_FAIL:
+							Unset($this->driver);
 							return($status);
 						default:
 							Unset($this->driver);

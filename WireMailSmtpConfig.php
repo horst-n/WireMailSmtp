@@ -1,8 +1,8 @@
-<?php
+<?php namespace ProcessWire;
 /*******************************************************************************
   *  WireMailSmtp | WireMailSmtpConfig
   * ---------------------------------------------------------------------------
-  *  @version     -   '0.6.4'
+  *  @version     -   '0.8.0'
   *  @author      -   Horst Nogajski
   *  @licence     -   GNU GPL v2 - http://www.gnu.org/licenses/gpl-2.0.html
 *******************************************************************************/
@@ -14,8 +14,9 @@ class WireMailSmtpConfig extends Wire {
     public function getConfig(array $data) {
 
         // check that they have the required PW version
-        if(version_compare(wire('config')->version, '2.4.1', '<')) {
-            $this->error(' requires ProcessWire 2.4.1 or newer. Please update.');
+        //if(version_compare(wire('config')->version, '2.4.1', '<')) {
+        if (version_compare(wire('config')->version, '3.0.160', '<')) {
+            $this->error(' requires ProcessWire 3.0.160 or newer. Please update.');
         }
 
         $siteconfig = is_array(wire('config')->wiremailsmtp) ? wire('config')->wiremailsmtp : array();

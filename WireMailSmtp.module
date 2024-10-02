@@ -1,4 +1,4 @@
-<?php
+<?php namespace ProcessWire;
 /**
  * SMTP Mailer WireMail module
  *
@@ -23,7 +23,7 @@ class WireMailSmtp extends WireMail implements Module, ConfigurableModule {
     public static function getModuleInfo() {
         return array(
             'title'     => 'Wire Mail SMTP',
-            'version'   => '0.6.4',
+            'version'   => '0.8.0',
             'summary'   => "Extends WireMail, uses SMTP protocol (plain | SSL | TLS), provides: to, cc, bcc, attachments, priority, disposition notification, bulksending, ...",
             'href'      => 'https://processwire.com/talk/topic/5704-module-wiremailsmtp/',
             'author'    => 'horst',

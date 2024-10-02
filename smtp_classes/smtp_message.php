@@ -2,7 +2,7 @@
 /*
  * smtp_message.php
  *
- * @(#) $Header: /opt2/ena/metal/mimemessage/smtp_message.php,v 1.36 2011/03/09 07:48:52 mlemos Exp $
+ * @(#) $Header: /opt2/ena/metal/mimemessage/smtp_message.php,v 1.41 2022/10/28 09:14:18 mlemos Exp $
  *
  *
  */
@@ -19,8 +19,8 @@
 	<package>net.manuellemos.mimemessage</package>
 
 	<name>smtp_message_class</name>
-	<version>@(#) $Id: smtp_message.php,v 1.36 2011/03/09 07:48:52 mlemos Exp $</version>
-	<copyright>Copyright © (C) Manuel Lemos 1999-2004</copyright>
+	<version>@(#) $Id: smtp_message.php,v 1.41 2022/10/28 09:14:18 mlemos Exp $</version>
+	<copyright>Copyright ? (C) Manuel Lemos 1999-2004</copyright>
 	<title>MIME E-mail message composing and sending via SMTP</title>
 	<author>Manuel Lemos</author>
 	<authoraddress>mlemos-at-acm.org</authoraddress>
@@ -85,7 +85,14 @@
 			<variablelink>smtp_realm</variablelink> to the Windows domain name
 			and also set the variable
 			<variablelink>smtp_workstation</variablelink> to the user workstation
-			name.<paragraphbreak />
+			name. If the server requires authentication via <tt>XOAUTH2</tt>
+			mechanism, you need to set the <variablelink>smtp_token</variablelink>
+			to the OAUTH2 token obtained separately. Alternatively you can set the
+			<variablelink>smtp_token_variable</variablelink> to make the the token
+			be retrieved from a token file created by the <link>
+				<data>OAuth client package</data>
+				<url>https://www.phpclasses.org/oauth-api</url>
+			</link>.<paragraphbreak />
 			Some servers require that the authentication be done on a separate
 			server using the POP3 protocol before connecting to the SMTP server.
 			In this case you need to specify the address of the POP3 server
@@ -145,16 +152,12 @@ class smtp_message_class extends email_message_class
 	var $delivery = 0;
 
 	/* Public variables */
-
 	/* Allow Self Signed Certificate */
 	var $smtp_certificate = 0;       // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
-
     /* @horst: Allow Connections without Authentication */
     var $allow_without_authentication = 0;
-
     /* @horst: Allow to define the crypto method for TLS connections */
     var $smtp_tls_crypto_method = '';
-
     /* @horst: Allow to define the crypto method for SSL connections */
     var $smtp_ssl_crypto_method = '';
 
@@ -227,6 +230,30 @@ class smtp_message_class extends email_message_class
 {/metadocument}
 */
 	var $smtp_ssl=0;
+
+/*
+{metadocument}
+	<variable>
+		<name>smtp_cryptographic_method</name>
+		<type>INTEGER</type>
+		<value>121</value>
+		<documentation>
+			<purpose>Define the cryptographic method to use after
+				connecting to the SMTP server when encryption is used
+				after the connection is established using TLS
+				protocol.</purpose>
+			<usage>Set to values defined in the <link>
+				<data>PHP documentation page about cryptographic
+				methods</data>
+				<url>https://www.php.net/manual/en/function.stream-socket-enable-crypto.php</url>
+			</link> if the default method is not accepted by the SMTP
+			server. You can use PHP constants like
+			STREAM_CRYPTO_METHOD_TLS_CLIENT .</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $smtp_cryptographic_method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
 
 /*
 {metadocument}
@@ -440,6 +467,125 @@ class smtp_message_class extends email_message_class
 /*
 {metadocument}
 	<variable>
+		<name>smtp_token</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the user authentication token needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $smtp_token="";
+
+/*
+{metadocument}
+	<variable>
+		<name>smtp_token_file</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the user authentication token file needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $smtp_token_file="";
+
+/*
+{metadocument}
+	<variable>
+		<name>smtp_authentication_server</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the user authentication token file needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $smtp_authentication_server="";
+
+/*
+{metadocument}
+	<variable>
+		<name>smtp_authentication_redirect_uri</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the user authentication redirect uri needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $smtp_authentication_redirect_uri="";
+
+/*
+{metadocument}
+	<variable>
+		<name>smtp_authentication_client_id</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the user authentication client id needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $smtp_authentication_client_id="";
+
+/*
+{metadocument}
+	<variable>
+		<name>smtp_authentication_client_secret</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the user authentication client secret needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $smtp_authentication_client_secret="";
+
+/*
+{metadocument}
+	<variable>
+		<name>smtp_authentication_scope</name>
+		<type>STRING</type>
+		<value></value>
+		<documentation>
+			<purpose>Specify the user authentication scope needed when
+				using the <tt>XOAUTH2</tt> authentication.</purpose>
+			<usage>Set this variable if you need to authenticate before sending
+				a message.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $smtp_authentication_scope="";
+
+/*
+{metadocument}
+	<variable>
 		<name>smtp_authentication_mechanism</name>
 		<type>STRING</type>
 		<value></value>
@@ -529,6 +675,24 @@ class smtp_message_class extends email_message_class
 /*
 {metadocument}
 	<variable>
+		<name>smtp_autoload</name>
+		<type>BOOLEAN</type>
+		<value>0</value>
+		<documentation>
+			<purpose>Specify whether the class should check if the SMTP class
+				exists or should it be loaded with an autoloader.</purpose>
+			<usage>Set this variable to
+				<tt><booleanvalue>1</booleanvalue></tt> if you are using an
+					autoloader to load the SMTP class.</usage>
+		</documentation>
+	</variable>
+{/metadocument}
+*/
+	var $smtp_autoload=0;
+
+/*
+{metadocument}
+	<variable>
 		<name>esmtp</name>
 		<type>BOOLEAN</type>
 		<value>1</value>
@@ -582,7 +746,7 @@ class smtp_message_class extends email_message_class
 {metadocument}
 	<variable>
 		<name>mailer_delivery</name>
-		<value>smtp $Revision: 1.36 $</value>
+		<value>smtp $Revision: 1.41 $</value>
 		<documentation>
 			<purpose>Specify the text that is used to identify the mail
 				delivery class or sub-class. This text is appended to the
@@ -593,7 +757,7 @@ class smtp_message_class extends email_message_class
 	</variable>
 {/metadocument}
 */
-	var $mailer_delivery='smtp $Revision: 1.36 $';
+	var $mailer_delivery='smtp $Revision: 1.41 $';
 
 /*
 {metadocument}
@@ -644,7 +808,8 @@ class smtp_message_class extends email_message_class
 
 	Function StartSendingMessage()
 	{
-		if(function_exists("class_exists")
+		if(!$this->smtp_autoload
+		&& function_exists("class_exists")
 		&& !class_exists("smtp_class"))
 			return("the smtp_class class was not included");
 		if(IsSet($this->smtp))
@@ -655,9 +820,10 @@ class smtp_message_class extends email_message_class
 		$this->smtp->host_port=$this->smtp_port;
 		$this->smtp->ssl=$this->smtp_ssl;
         $this->smtp->smtp_ssl_crypto_method=$this->smtp_ssl_crypto_method;  // @horst
-		$this->smtp->start_tls=$this->smtp_start_tls;
+        $this->smtp->start_tls=$this->smtp_start_tls;
         $this->smtp->smtp_tls_crypto_method=$this->smtp_tls_crypto_method;  // @horst
-        $this->smtp->http_proxy_host_name=$this->smtp_http_proxy_host_name;
+		$this->smtp->cryptographic_method = $this->smtp_cryptographic_method;
+		$this->smtp->http_proxy_host_name=$this->smtp_http_proxy_host_name;
 		$this->smtp->http_proxy_host_port=$this->smtp_http_proxy_host_port;
 		$this->smtp->socks_host_name=$this->smtp_socks_host_name;
 		$this->smtp->socks_host_port=$this->smtp_socks_host_port;
@@ -672,7 +838,14 @@ class smtp_message_class extends email_message_class
 		$this->smtp->user=$this->smtp_user;
 		$this->smtp->realm=$this->smtp_realm;
 		$this->smtp->workstation=$this->smtp_workstation;
+		$this->smtp->token=$this->smtp_token;
+		$this->smtp->token_file=$this->smtp_token_file;
 		$this->smtp->authentication_mechanism=$this->smtp_authentication_mechanism;
+		$this->smtp->authentication_server=$this->smtp_authentication_server;
+		$this->smtp->authentication_redirect_uri=$this->smtp_authentication_redirect_uri;
+		$this->smtp->authentication_client_id=$this->smtp_authentication_client_id;
+		$this->smtp->authentication_client_secret=$this->smtp_authentication_client_secret;
+		$this->smtp->authentication_scope=$this->smtp_authentication_scope;
 		$this->smtp->password=$this->smtp_password;
 		$this->smtp->esmtp=$this->esmtp;
 		$this->smtp->smtp_certificate = $this->smtp_certificate;  // @flydev: https://processwire.com/talk/topic/5704-wiremailsmtp/page-5#entry113290
@@ -688,7 +861,7 @@ class smtp_message_class extends email_message_class
 	Function SendMessageHeaders($headers)
 	{
 		$header_data="";
-		$date=date("D, d M Y H:i:s T");
+		$date=date("r");
 		if($this->smtp_direct_delivery
 		&& strlen($this->localhost))
 		{
