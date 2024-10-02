@@ -15,8 +15,8 @@ class WireMailSmtpConfig extends Wire {
 
         // check that they have the required PW version
         //if(version_compare(wire('config')->version, '2.4.1', '<')) {
-        if (version_compare(wire('config')->version, '3.0.160', '<')) {
-            $this->error(' requires ProcessWire 3.0.160 or newer. Please update.');
+        if (version_compare(wire('config')->version, '3.0.62', '<')) {
+            $this->error(' requires ProcessWire 3.0.62 or newer. Please update.');
         }
 
         $siteconfig = is_array(wire('config')->wiremailsmtp) ? wire('config')->wiremailsmtp : array();

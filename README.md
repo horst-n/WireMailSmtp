@@ -3,9 +3,9 @@ WireMailSmtp
 
 ### ProcessWire: a extension to the WireMail base class that uses SMTP-transport ###
 
-### Only functional with ProcessWire Version 2.4.1 or greater ###
+### Formerly usable with ProcessWire version 2.4.1 or greater, changed since module version 0.8.0 to ProcessWire version 3.0.62 or greater ###
 
-This module integrates EmailMessage, SMTP and SASL php-libraries from [Manuel Lemos](http://www.phpclasses.org/browse/author/1.html) into ProcessWire.
+This module integrates EmailMessage, SMTP and SASL php-libraries from [Manuel Lemos](http://www.phpclasses.org/browse/author/1.html) into ProcessWire
 
 
 [More information and code examples](http://processwire.com/talk/topic/5704-module-wiremailsmtp/)
@@ -13,7 +13,7 @@ This module integrates EmailMessage, SMTP and SASL php-libraries from [Manuel Le
 ---
 
 
-### Current Version 0.6.1 ###
+### Current Version 0.8.0 ###
 
 
 
