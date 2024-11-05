@@ -1,0 +1,27 @@
+{
+  "name": " WireMailSmtp @ rev-8 ",
+  "version": " 0.8.X",
+  "description": "",
+  "main": "",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/horst-n/WireMailSmtp"
+  },
+  "keywords": [
+    "Processwire",
+    "Processwire Module",
+    "PHP"
+  ],
+  "author": "Horst Nogajski",
+  "license": "PRIVATE",
+  "bugs": {
+    "url": "https://github.com/horst-n/WireMailSmtp/issues"
+  },
+  "homepage": "",
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
